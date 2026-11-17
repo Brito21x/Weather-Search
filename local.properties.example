@@ -1,0 +1,6 @@
+## Example local.properties for Weather Search
+# Location of the SDK (configured automatically by Android Studio)
+# sdk.dir=C\:\\Users\\<username>\\AppData\\Local\\Android\\Sdk
+
+# WeatherAPI Key (obtained from https://www.weatherapi.com/)
+WEATHER_API_KEY=YOUR_API_KEY_HERE
