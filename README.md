@@ -66,8 +66,8 @@ A aplicação consome a API REST da **WeatherAPI**, processando os dados meteoro
   * Ecrã dedicado acessível através da barra de navegação inferior.
 * **Partilha Nativa de Boletim**:
   * Ação integrada para envio do resumo meteorológico via Android Sharesheet (`Intent.ACTION_SEND`).
-* **Feedback de Interface (UI States)**:
-  * Tratamento para todos os estados de ecrã: *Loading*, *Success*, *Empty* e *Error* (com botão para nova tentativa).
+* **Feedback de Interface (ViewState)**:
+  * Gestão de estado integrada e reativa através de `HomeViewState` (`searchQuery`, `weather`, `errorMessage`, `isLoading`), permitindo renderização determinística de carregamento (*Loading*), dados com sucesso (*Success*), ecrã inicial (*Empty*) e tratamento de falhas (*Error*) com botão de nova tentativa.
 
 ---
 
@@ -196,9 +196,13 @@ GET https://api.weatherapi.com/v1/forecast.json?key={API_KEY}&q={CIDADE}&days={D
 ## 💡 Boas Práticas de Engenharia
 * **Zero Bloqueios na Main Thread**: Todo o processamento de rede e parsing de dados corre em threads secundárias do pool do OkHttp.
 * **Single Source of Truth (SSOT)**: O repositório central (`WeatherRepository`) é a única fonte de verdade para cache em memória e persistência local, evitando duplicação de dados.
-* **Arquitetura Modular por Funcionalidade (Package-by-Feature)**: Cada ecrã possui o seu próprio ViewModel e estado (`ui/home`, `ui/favorites`, `ui/detail`), eliminando o anti-padrão do "God ViewModel" e garantindo escalabilidade.
+* **Arquitetura Modular por Funcionalidade (Package-by-Feature)**: Cada ecrã possui o seu próprio ViewModel e ViewState autocontido, eliminando o anti-padrão do "God ViewModel" e garantindo escalabilidade:
+  * `HomeViewModel` com `HomeViewState` (pesquisa e boletim principal);
+  * `FavoritesViewModel` com `FavoritesViewState` (gestão e persistência de cidades guardadas);
+  * `ForecastDetailViewModel` com `ForecastDetailViewState` (leitura dos dados detalhados do dia em memória).
 * **Desacoplamento Rigoroso da Camada de UI**: Os ViewModels são puros e não retêm referências a `Context` nem constroem `Intent`s; a abertura do sistema de partilha nativo é orquestrada na camada de UI.
 * **Reatividade com Kotlin Coroutines & Flow**: Uso de `StateFlow` e do operador `combine` para reatividade imediata no ícone de favoritos da barra superior.
+* **Navegação Integrada e Reativa**: A `MainActivity` alberga o `Scaffold`, o `NavHost` (`WeatherApp`) e as barras adaptativas, consumindo as rotas declaradas no `Screen.kt`.
 * **Suporte a Previews no Android Studio**: Todos os componentes visuais contêm funções `@Preview` operacionais (sem falhas de LayoutLib por recurso ao `LocalInspectionMode`).
 * **Design Edge-to-Edge**: Aplicação configurada com `enableEdgeToEdge()` para integração total com barras de estado e navegação do sistema.
 * **Ícones Adaptativos**: Ícone oficial com suporte a máscaras dinâmicas (círculo, quadrado e squircle) em Android 8.0+.
