@@ -7,10 +7,6 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -22,22 +18,16 @@ fun WeatherBottomBar(
     currentRoute: String?,
     onNavigateToRoute: (String) -> Unit
 ) {
-    var selectedRoute by rememberSaveable { mutableStateOf(Screen.Home.route) }
-    val activeRoute = currentRoute ?: selectedRoute
-
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.surface,
         tonalElevation = 3.dp
     ) {
         Screen.bottomNavScreens.forEach { screen ->
-            val isSelected = activeRoute == screen.route
+            val isSelected = currentRoute == screen.route
 
             NavigationBarItem(
                 selected = isSelected,
-                onClick = {
-                    selectedRoute = screen.route
-                    onNavigateToRoute(screen.route)
-                },
+                onClick = { onNavigateToRoute(screen.route) },
                 icon = {
                     screen.icon?.let { icon ->
                         Icon(

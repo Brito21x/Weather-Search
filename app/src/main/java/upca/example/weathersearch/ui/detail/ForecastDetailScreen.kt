@@ -1,6 +1,5 @@
 package upca.example.weathersearch.ui.detail
 
-import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -39,6 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import upca.example.weathersearch.data.model.ForecastDayDomain
 import upca.example.weathersearch.ui.components.WeatherIcon
 import upca.example.weathersearch.ui.theme.RainBlue
@@ -48,9 +48,9 @@ import upca.example.weathersearch.ui.theme.WeatherSearchTheme
 
 @Composable
 fun ForecastDetailScreen(
-    viewModel: ForecastDetailViewModel,
     dayDate: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: ForecastDetailViewModel = viewModel()
 ) {
     val selectedDay by viewModel.selectedForecastDay.collectAsState()
 
@@ -279,30 +279,7 @@ private fun BasicMetricCard(
 @Preview(showBackground = true, name = "ForecastDetail Light", heightDp = 720)
 @Composable
 fun ForecastDetailPreview() {
-    WeatherSearchTheme(darkTheme = false) {
-        ForecastDetailContent(
-            forecastDay = ForecastDayDomain(
-                dayIndex = 1,
-                dayLabel = "Amanhã",
-                date = "2026-11-18",
-                dayOfWeek = "Quarta-feira, 18 de Novembro",
-                maxTemp = 19.4,
-                minTemp = 11.2,
-                avgTemp = 15.3,
-                conditionText = "Parcialmente nublado",
-                iconUrl = "https://cdn.weatherapi.com/weather/64x64/day/116.png",
-                chanceOfRain = 25,
-                windKph = 14.8,
-                humidity = 72
-            )
-        )
-    }
-}
-
-@Preview(showBackground = true, name = "ForecastDetail Dark", uiMode = Configuration.UI_MODE_NIGHT_YES, heightDp = 720)
-@Composable
-fun ForecastDetailDarkPreview() {
-    WeatherSearchTheme(darkTheme = true) {
+    WeatherSearchTheme {
         ForecastDetailContent(
             forecastDay = ForecastDayDomain(
                 dayIndex = 1,

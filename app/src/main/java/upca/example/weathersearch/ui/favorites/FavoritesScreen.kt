@@ -32,24 +32,21 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import upca.example.weathersearch.ui.theme.WeatherSearchTheme
 
 @Composable
 fun FavoritesScreen(
-    viewModel: FavoritesViewModel,
     onCitySelected: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: FavoritesViewModel = viewModel()
 ) {
     val favorites by viewModel.favoriteCities.collectAsState()
 
     FavoritesContent(
         favorites = favorites,
-        onCityClick = { city ->
-            onCitySelected(city)
-        },
-        onDeleteClick = { city ->
-            viewModel.removeFavorite(city)
-        },
+        onCityClick = onCitySelected,
+        onDeleteClick = viewModel::removeFavorite,
         modifier = modifier
     )
 }
