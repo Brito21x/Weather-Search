@@ -185,7 +185,7 @@ GET https://api.weatherapi.com/v1/forecast.json?key={API_KEY}&q={CIDADE}&days={D
 - [x] Separação do Composable da linha da lista e do ecrã de detalhe em ficheiros e pacotes modulares distintos.
 
 ### 3. Navegação Multi-Ecrã com Navigation Compose
-- [x] Definição de rotas tipadas através de **`sealed class Screen`** e grafo com **`NavHost`** / **`NavController`**.
+- [x] Definição de rotas tipadas através de **`sealed class Screen`** e grafo com **`NavHost`** / **`NavController`** integrado em **`MainActivity.kt`**.
 - [x] Organização estrutural com **`Scaffold`** (`topBar`, `bottomBar`, conteúdo).
 - [x] Barra de navegação inferior com **`NavigationBar`** e **`NavigationBarItem`** sincronizada com o estado da rota atual.
 - [x] Barra superior dinâmica (**`WeatherTopBar`**) com título adaptativo, botão voltar e ações reativas de partilha e favoritos.
@@ -210,7 +210,7 @@ GET https://api.weatherapi.com/v1/forecast.json?key={API_KEY}&q={CIDADE}&days={D
 ```text
 app/src/main/java/upca/example/weathersearch/
 │
-├── MainActivity.kt                 # Ponto de entrada Android (Edge-to-Edge)
+├── MainActivity.kt                 # Ponto de entrada Android, Scaffold e Grafo de Navegação (WeatherApp)
 │
 ├── data/
 │   ├── model/
@@ -221,8 +221,7 @@ app/src/main/java/upca/example/weathersearch/
 │       └── WeatherRepository.kt    # Repositório de dados e preferências
 │
 ├── navigation/
-│   ├── Screen.kt                   # Sealed class de rotas e destinos
-│   └── WeatherNavGraph.kt          # Scaffold principal e NavHost
+│   └── Screen.kt                   # Sealed class de rotas e destinos
 │
 ├── ui/
 │   ├── components/                 # Componentes de interface modulares e reutilizáveis
