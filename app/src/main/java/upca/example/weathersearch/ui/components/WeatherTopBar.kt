@@ -17,7 +17,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import upca.example.weathersearch.ui.theme.WeatherSearchTheme
 
-// Barra de topo com suporte a navegação retroceder, partilha e favoritos
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WeatherTopBar(
@@ -39,7 +38,6 @@ fun WeatherTopBar(
             )
         },
         navigationIcon = {
-            // Exibe o botão de retorno apenas em ecrãs de detalhe
             if (!isBaseScreen) {
                 IconButton(onClick = onBackClick) {
                     Icon(
@@ -50,7 +48,6 @@ fun WeatherTopBar(
             }
         },
         actions = {
-            // Ação de favoritar cidade
             if (canBookmark) {
                 IconButton(onClick = onBookmarkClick) {
                     Icon(
@@ -61,7 +58,6 @@ fun WeatherTopBar(
                 }
             }
 
-            // Ação de partilha do boletim meteorológico
             if (canShare) {
                 IconButton(onClick = onShareClick) {
                     Icon(
@@ -80,7 +76,6 @@ fun WeatherTopBar(
     )
 }
 
-// Pré-visualização da TopBar no ecrã base com ações ativas
 @Preview(showBackground = true)
 @Composable
 fun WeatherTopBarBasePreview() {
@@ -95,7 +90,6 @@ fun WeatherTopBarBasePreview() {
     }
 }
 
-// Pré-visualização da TopBar no ecrã de detalhe com botão voltar
 @Preview(showBackground = true)
 @Composable
 fun WeatherTopBarDetailPreview() {

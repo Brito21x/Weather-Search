@@ -30,7 +30,6 @@ import upca.example.weathersearch.ui.theme.RainBlue
 import upca.example.weathersearch.ui.theme.SunYellow
 import upca.example.weathersearch.ui.theme.WeatherSearchTheme
 
-// Item reutilizável de linha para a lista de previsão diária
 @Composable
 fun ForecastDayRow(
     forecastDay: ForecastDayDomain,
@@ -55,7 +54,6 @@ fun ForecastDayRow(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            // Identificação do dia e probabilidade de chuva
             Column(
                 modifier = Modifier.weight(1.3f)
             ) {
@@ -90,7 +88,6 @@ fun ForecastDayRow(
                 }
             }
 
-            // Ícone da condição meteorológica e descrição
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.weight(1f),
@@ -110,7 +107,6 @@ fun ForecastDayRow(
                 )
             }
 
-            // Temperaturas máxima e mínima com botão de detalhe
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.End,
@@ -142,7 +138,6 @@ fun ForecastDayRow(
     }
 }
 
-// Pré-visualização da linha de previsão diária
 @Preview(showBackground = true)
 @Composable
 fun ForecastDayRowPreview() {

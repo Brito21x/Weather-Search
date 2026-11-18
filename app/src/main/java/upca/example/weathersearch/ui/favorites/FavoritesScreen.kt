@@ -1,4 +1,4 @@
-package upca.example.weathersearch.ui.home
+package upca.example.weathersearch.ui.favorites
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -34,11 +34,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import upca.example.weathersearch.ui.theme.WeatherSearchTheme
 
-// Ecrã de favoritos com subscrição ao StateFlow do ViewModel
 @Composable
 fun FavoritesScreen(
-    viewModel: WeatherViewModel,
-    onCitySelected: () -> Unit,
+    viewModel: FavoritesViewModel,
+    onCitySelected: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val favorites by viewModel.favoriteCities.collectAsState()
@@ -46,17 +45,15 @@ fun FavoritesScreen(
     FavoritesContent(
         favorites = favorites,
         onCityClick = { city ->
-            viewModel.searchWeather(city)
-            onCitySelected()
+            onCitySelected(city)
         },
         onDeleteClick = { city ->
-            viewModel.toggleFavoriteCity(city)
+            viewModel.removeFavorite(city)
         },
         modifier = modifier
     )
 }
 
-// Conteúdo declarativo do ecrã de favoritos para suporte a pré-visualização
 @Composable
 fun FavoritesContent(
     favorites: Set<String>,
@@ -82,7 +79,6 @@ fun FavoritesContent(
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
-        // Exibe mensagem de lista vazia quando não existem favoritos
         if (favorites.isEmpty()) {
             Column(
                 modifier = Modifier
@@ -111,12 +107,11 @@ fun FavoritesContent(
                 )
             }
         } else {
-            // Lista vertical de cidades guardadas com peso delimitado para o preview
             LazyColumn(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                items(favorites.toList()) { city ->
+                items(favorites.toList(), key = { it }) { city ->
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -150,7 +145,6 @@ fun FavoritesContent(
                                 )
                             }
 
-                            // Botão de remoção rápida da cidade guardada
                             IconButton(onClick = { onDeleteClick(city) }) {
                                 Icon(
                                     imageVector = Icons.Default.Delete,
@@ -166,7 +160,6 @@ fun FavoritesContent(
     }
 }
 
-// Pré-visualização do ecrã com lista de favoritos preenchida
 @Preview(showBackground = true, heightDp = 600)
 @Composable
 fun FavoritesContentPreview() {
@@ -179,7 +172,6 @@ fun FavoritesContentPreview() {
     }
 }
 
-// Pré-visualização do ecrã de favoritos quando vazio
 @Preview(showBackground = true, heightDp = 600)
 @Composable
 fun FavoritesEmptyPreview() {

@@ -5,14 +5,12 @@ import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.ui.graphics.vector.ImageVector
 
-// Rotas da aplicação organizadas através de sealed class
 sealed class Screen(
     val route: String,
     val title: String,
     val icon: ImageVector? = null,
     val isBaseScreen: Boolean = true
 ) {
-    // Ecrã principal de pesquisa e previsão meteorológica
     object Home : Screen(
         route = "home",
         title = "Weather Search",
@@ -20,7 +18,6 @@ sealed class Screen(
         isBaseScreen = true
     )
 
-    // Ecrã com a lista de cidades guardadas
     object Favorites : Screen(
         route = "favorites",
         title = "Cidades Guardadas",
@@ -28,7 +25,6 @@ sealed class Screen(
         isBaseScreen = true
     )
 
-    // Ecrã de detalhe para exibição dos dados básicos do dia selecionado
     object Detail : Screen(
         route = "detail/{dayDate}",
         title = "Detalhe do Dia",
@@ -40,10 +36,8 @@ sealed class Screen(
     }
 
     companion object {
-        // Ecrãs apresentados na barra de navegação inferior
         val bottomNavScreens = listOf(Home, Favorites)
 
-        // Resolve o ecrã correspondente à rota fornecida
         fun fromRoute(route: String?): Screen {
             return when {
                 route == null -> Home

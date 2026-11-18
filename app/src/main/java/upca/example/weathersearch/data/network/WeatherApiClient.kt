@@ -15,11 +15,10 @@ import java.io.IOException
 import java.net.URLEncoder
 import java.util.concurrent.TimeUnit
 
-// Cliente HTTP para pedidos assíncronos à WeatherAPI com OkHttp
 class WeatherApiClient(
     private val apiKey: String = BuildConfig.WEATHER_API_KEY
 ) {
-    // Cliente OkHttp configurado com timeouts de 15 segundos
+    // Configuração do cliente HTTP com timeouts e recuperação automática de falhas
     private val client: OkHttpClient = OkHttpClient.Builder()
         .connectTimeout(15, TimeUnit.SECONDS)
         .readTimeout(15, TimeUnit.SECONDS)
@@ -29,7 +28,7 @@ class WeatherApiClient(
 
     private val gson = Gson()
 
-    // Formata a pesquisa para priorizar localidades de Portugal
+    // Normaliza a pesquisa: se for apenas o nome de uma localidade, restringe o contexto a Portugal
     private fun formatPortugalQuery(rawQuery: String): String {
         val trimmed = rawQuery.trim()
         val isCoordinates = trimmed.matches(Regex("^-?\\d+(\\.\\d+)?,\\s*-?\\d+(\\.\\d+)?$"))
@@ -40,7 +39,7 @@ class WeatherApiClient(
         }
     }
 
-    // Executa pedido HTTP GET assíncrono na thread de background via enqueue
+    // Executa a chamada à WeatherAPI de forma assíncrona, delegando o processamento para a thread pool do OkHttp
     fun fetchForecastAsync(
         query: String,
         days: Int = 5,
@@ -72,7 +71,7 @@ class WeatherApiClient(
             .addHeader("Accept", "application/json")
             .build()
 
-        // Execução assíncrona fora da Main Thread com callback OkHttp
+        // enqueue corre fora da Main Thread, evitando o bloqueio da interface gráfica
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 val errorMsg = when {
@@ -90,7 +89,6 @@ class WeatherApiClient(
                 response.use { res ->
                     val responseBody = res.body?.string()
 
-                    // Validação de códigos HTTP de resposta
                     if (!res.isSuccessful) {
                         val message = extractErrorMessage(responseBody, res.code)
                         onError(message)
@@ -102,7 +100,7 @@ class WeatherApiClient(
                         return
                     }
 
-                    // Conversão do JSON para os modelos de domínio Kotlin
+                    // Faz o parse do JSON da API e converte para o modelo de domínio da aplicação
                     try {
                         val apiResponse = gson.fromJson(responseBody, WeatherApiResponse::class.java)
                         val domainData = apiResponse.toDomain()
@@ -115,7 +113,7 @@ class WeatherApiClient(
         })
     }
 
-    // Extrai mensagem descritiva de erro devolvida pela API ou código HTTP
+    // Tenta obter a mensagem de erro específica enviada pela WeatherAPI no JSON; se falhar, utiliza o código de status HTTP
     private fun extractErrorMessage(responseBody: String?, statusCode: Int): String {
         if (!responseBody.isNullOrBlank()) {
             try {
@@ -134,7 +132,7 @@ class WeatherApiClient(
                     }
                 }
             } catch (e: Exception) {
-                // Fallback para código de status
+                // Fallback para mapeamento por código HTTP
             }
         }
         return when (statusCode) {

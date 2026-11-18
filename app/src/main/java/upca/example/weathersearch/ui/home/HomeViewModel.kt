@@ -10,46 +10,33 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
-import upca.example.weathersearch.data.model.ForecastDayDomain
-import upca.example.weathersearch.data.model.WeatherDomain
 import upca.example.weathersearch.data.repository.WeatherRepository
 
-// ViewModel responsável pelo estado da UI e orquestração dos pedidos
-class WeatherViewModel(
+class HomeViewModel(
     application: Application
 ) : AndroidViewModel(application) {
 
-    private val repository = WeatherRepository(application.applicationContext)
+    private val repository = WeatherRepository.getInstance(application.applicationContext)
 
-    // Estado da UI exposto como StateFlow para a Compose UI
     private val _uiState = MutableStateFlow<WeatherUiState>(WeatherUiState.Empty)
     val uiState: StateFlow<WeatherUiState> = _uiState.asStateFlow()
 
-    // Texto da caixa de pesquisa
     private val _searchQuery = MutableStateFlow("Barcelos")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
-    // Dia selecionado para navegação lista-detalhe
-    private val _selectedForecastDay = MutableStateFlow<ForecastDayDomain?>(null)
-    val selectedForecastDay: StateFlow<ForecastDayDomain?> = _selectedForecastDay.asStateFlow()
-
-    // Lista de cidades favoritas guardadas
     val favoriteCities: StateFlow<Set<String>> = repository.favoriteCities
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptySet())
 
     private var lastQueriedLocation: String = "Barcelos"
 
     init {
-        // Inicializa com a cidade de Barcelos
         searchWeather("Barcelos")
     }
 
-    // Atualiza o texto da pesquisa
     fun onQueryChange(newQuery: String) {
         _searchQuery.value = newQuery
     }
 
-    // Executa a pesquisa para uma localidade
     fun searchWeather(cityName: String) {
         val trimmed = cityName.trim()
         if (trimmed.isBlank()) {
@@ -73,7 +60,6 @@ class WeatherViewModel(
         )
     }
 
-    // Pesquisa a meteorologia com recurso a coordenadas de GPS
     fun searchByCoordinates(lat: Double, lon: Double) {
         val query = "$lat,$lon"
         lastQueriedLocation = query
@@ -92,43 +78,20 @@ class WeatherViewModel(
         )
     }
 
-    // Repete a pesquisa da última localidade
     fun retryLastSearch() {
         searchWeather(lastQueriedLocation)
     }
 
-    // Define o dia selecionado para o ecrã de detalhe
-    fun selectForecastDay(day: ForecastDayDomain) {
-        _selectedForecastDay.value = day
-    }
-
-    // Procura o dia selecionado pela data correspondente
-    fun selectForecastDayByDate(date: String) {
-        val currentSuccess = _uiState.value as? WeatherUiState.Success
-        val found = currentSuccess?.weather?.forecastDays?.find { it.date == date }
-        if (found != null) {
-            _selectedForecastDay.value = found
-        }
-    }
-
-    // Alterna o favorito da cidade atual
     fun toggleFavoriteCurrentCity() {
         val currentSuccess = _uiState.value as? WeatherUiState.Success ?: return
         repository.toggleFavorite(currentSuccess.weather.cityName)
     }
 
-    // Alterna o favorito de uma cidade especificada
-    fun toggleFavoriteCity(cityName: String) {
-        repository.toggleFavorite(cityName)
-    }
-
-    // Indica se a localidade atual é favorita
     fun isCurrentCityBookmarked(): Boolean {
         val currentSuccess = _uiState.value as? WeatherUiState.Success ?: return false
         return repository.isFavorite(currentSuccess.weather.cityName)
     }
 
-    // Partilha os dados do tempo via Intent ACTION_SEND
     fun shareCurrentWeather(context: Context) {
         val currentSuccess = _uiState.value as? WeatherUiState.Success ?: return
         val weather = currentSuccess.weather

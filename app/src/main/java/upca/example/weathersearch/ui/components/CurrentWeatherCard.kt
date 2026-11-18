@@ -38,7 +38,6 @@ import upca.example.weathersearch.ui.theme.WeatherBluePrimary
 import upca.example.weathersearch.ui.theme.WeatherBlueSecondary
 import upca.example.weathersearch.ui.theme.WeatherSearchTheme
 
-// Cartão de destaque com o tempo atual e detalhes rápidos da localidade
 @Composable
 fun CurrentWeatherCard(
     weather: WeatherDomain,
@@ -62,7 +61,6 @@ fun CurrentWeatherCard(
             Column(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                // Cabeçalho com o nome da localidade pesquisada
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -83,7 +81,6 @@ fun CurrentWeatherCard(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Temperatura atual, descrição e ícone da condição
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -118,7 +115,6 @@ fun CurrentWeatherCard(
 
                 Spacer(modifier = Modifier.height(18.dp))
 
-                // Detalhes rápidos: Sensação térmica, Humidade e Velocidade do vento
                 Text(
                     text = "Detalhes Rápidos",
                     style = MaterialTheme.typography.labelMedium,
@@ -156,7 +152,6 @@ fun CurrentWeatherCard(
     }
 }
 
-// Item indicador de métrica para os detalhes rápidos
 @Composable
 private fun WeatherMetricItem(
     icon: ImageVector,
@@ -187,7 +182,6 @@ private fun WeatherMetricItem(
     }
 }
 
-// Pré-visualização do cartão do tempo atual
 @Preview(showBackground = true)
 @Composable
 fun CurrentWeatherCardPreview() {

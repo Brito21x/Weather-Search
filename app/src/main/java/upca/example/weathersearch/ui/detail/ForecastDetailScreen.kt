@@ -1,4 +1,4 @@
-package upca.example.weathersearch.ui.home
+package upca.example.weathersearch.ui.detail
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
@@ -13,7 +13,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Air
 import androidx.compose.material.icons.filled.CalendarToday
@@ -25,6 +27,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -43,27 +46,24 @@ import upca.example.weathersearch.ui.theme.WeatherBluePrimary
 import upca.example.weathersearch.ui.theme.WeatherBlueSecondary
 import upca.example.weathersearch.ui.theme.WeatherSearchTheme
 
-// Ecrã de detalhe com dados básicos do dia da previsão
 @Composable
 fun ForecastDetailScreen(
-    viewModel: WeatherViewModel,
+    viewModel: ForecastDetailViewModel,
     dayDate: String,
     modifier: Modifier = Modifier
 ) {
     val selectedDay by viewModel.selectedForecastDay.collectAsState()
 
-    val forecastDay = selectedDay ?: run {
-        viewModel.selectForecastDayByDate(dayDate)
-        viewModel.selectedForecastDay.collectAsState().value
+    LaunchedEffect(dayDate) {
+        viewModel.loadForecastDayByDate(dayDate)
     }
 
     ForecastDetailContent(
-        forecastDay = forecastDay,
+        forecastDay = selectedDay,
         modifier = modifier
     )
 }
 
-// Conteúdo declarativo dos dados meteorológicos básicos do dia
 @Composable
 fun ForecastDetailContent(
     forecastDay: ForecastDayDomain?,
@@ -89,10 +89,10 @@ fun ForecastDetailContent(
     Column(
         modifier = modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Cartão principal com data, condição e temperaturas
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(20.dp),
@@ -176,7 +176,6 @@ fun ForecastDetailContent(
             }
         }
 
-        // Grelha com métricas básicas do dia
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -225,7 +224,6 @@ fun ForecastDetailContent(
     }
 }
 
-// Cartão reutilizável para métricas meteorológicas básicas
 @Composable
 private fun BasicMetricCard(
     title: String,
@@ -278,8 +276,7 @@ private fun BasicMetricCard(
     }
 }
 
-// Pré-visualização do ecrã de detalhe em modo claro
-@Preview(showBackground = true, name = "ForecastDetail Light")
+@Preview(showBackground = true, name = "ForecastDetail Light", heightDp = 720)
 @Composable
 fun ForecastDetailPreview() {
     WeatherSearchTheme(darkTheme = false) {
@@ -302,8 +299,7 @@ fun ForecastDetailPreview() {
     }
 }
 
-// Pré-visualização do ecrã de detalhe em modo escuro
-@Preview(showBackground = true, name = "ForecastDetail Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(showBackground = true, name = "ForecastDetail Dark", uiMode = Configuration.UI_MODE_NIGHT_YES, heightDp = 720)
 @Composable
 fun ForecastDetailDarkPreview() {
     WeatherSearchTheme(darkTheme = true) {
@@ -322,6 +318,16 @@ fun ForecastDetailDarkPreview() {
                 windKph = 14.8,
                 humidity = 72
             )
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "ForecastDetail Empty", heightDp = 400)
+@Composable
+fun ForecastDetailEmptyPreview() {
+    WeatherSearchTheme {
+        ForecastDetailContent(
+            forecastDay = null
         )
     }
 }

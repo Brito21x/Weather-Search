@@ -17,16 +17,12 @@ import androidx.compose.ui.unit.dp
 import upca.example.weathersearch.navigation.Screen
 import upca.example.weathersearch.ui.theme.WeatherSearchTheme
 
-// Barra de navegação inferior com preservação da rota via rememberSaveable
 @Composable
 fun WeatherBottomBar(
     currentRoute: String?,
     onNavigateToRoute: (String) -> Unit
 ) {
-    // Preserva a seleção do item ativo entre recomposições
     var selectedRoute by rememberSaveable { mutableStateOf(Screen.Home.route) }
-
-    // Sincroniza a rota ativa atual
     val activeRoute = currentRoute ?: selectedRoute
 
     NavigationBar(
@@ -68,7 +64,6 @@ fun WeatherBottomBar(
     }
 }
 
-// Pré-visualização da barra de navegação inferior
 @Preview(showBackground = true)
 @Composable
 fun WeatherBottomBarPreview() {

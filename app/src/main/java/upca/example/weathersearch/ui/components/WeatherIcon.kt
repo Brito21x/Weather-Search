@@ -1,5 +1,6 @@
 package upca.example.weathersearch.ui.components
 
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material3.Icon
@@ -7,11 +8,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import upca.example.weathersearch.ui.theme.SunYellow
 import upca.example.weathersearch.ui.theme.WeatherSearchTheme
 
-// Componente para ícones meteorológicos com salvaguarda nativa para o modo Preview
 @Composable
 fun WeatherIcon(
     iconUrl: String,
@@ -19,7 +20,7 @@ fun WeatherIcon(
     modifier: Modifier = Modifier
 ) {
     if (LocalInspectionMode.current) {
-        // Exibe ícone vetorial no preview sem tentar chamadas de rede no LayoutLib
+        // No modo Preview, usa ícone vetorial para evitar chamadas de rede no LayoutLib
         Icon(
             imageVector = Icons.Default.WbSunny,
             contentDescription = contentDescription,
@@ -32,17 +33,25 @@ fun WeatherIcon(
             contentDescription = contentDescription,
             modifier = modifier
         )
+    } else {
+        // Fallback quando não há URL disponível
+        Icon(
+            imageVector = Icons.Default.WbSunny,
+            contentDescription = contentDescription,
+            tint = SunYellow,
+            modifier = modifier
+        )
     }
 }
 
-// Pré-visualização do componente de ícone meteorológico
 @Preview(showBackground = true)
 @Composable
 fun WeatherIconPreview() {
     WeatherSearchTheme {
         WeatherIcon(
-            iconUrl = "",
-            contentDescription = "Ícone de pré-visualização"
+            iconUrl = "https://cdn.weatherapi.com/weather/64x64/day/116.png",
+            contentDescription = "Ícone de pré-visualização",
+            modifier = Modifier.size(64.dp)
         )
     }
 }

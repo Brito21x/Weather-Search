@@ -17,32 +17,34 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import upca.example.weathersearch.ui.components.WeatherBottomBar
 import upca.example.weathersearch.ui.components.WeatherTopBar
-import upca.example.weathersearch.ui.home.FavoritesScreen
-import upca.example.weathersearch.ui.home.ForecastDetailScreen
+import upca.example.weathersearch.ui.detail.ForecastDetailScreen
+import upca.example.weathersearch.ui.detail.ForecastDetailViewModel
+import upca.example.weathersearch.ui.favorites.FavoritesScreen
+import upca.example.weathersearch.ui.favorites.FavoritesViewModel
 import upca.example.weathersearch.ui.home.HomeScreen
+import upca.example.weathersearch.ui.home.HomeViewModel
 import upca.example.weathersearch.ui.home.WeatherUiState
-import upca.example.weathersearch.ui.home.WeatherViewModel
 
-// Estrutura de navegação multi-ecrã com Scaffold, TopBar e BottomBar
+// Estrutura principal da aplicação: coordena Scaffold, TopBar adaptativa, BottomBar e o grafo de rotas
 @Composable
 fun WeatherApp(
     navController: NavHostController = rememberNavController(),
-    viewModel: WeatherViewModel = viewModel()
+    homeViewModel: HomeViewModel = viewModel()
 ) {
     val context = LocalContext.current
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    // Distingue ecrãs base de ecrãs de detalhe
     val currentScreen = Screen.fromRoute(currentRoute)
     val isBaseScreen = currentScreen.isBaseScreen
 
-    val uiState by viewModel.uiState.collectAsState()
-    val isSuccess = uiState is WeatherUiState.Success
-    val isBookmarked = viewModel.isCurrentCityBookmarked()
+    val homeUiState by homeViewModel.uiState.collectAsState()
+    val isSuccess = homeUiState is WeatherUiState.Success
+    val isBookmarked = homeViewModel.isCurrentCityBookmarked()
 
     Scaffold(
         topBar = {
+            // Configura dinamicamente título e ações (partilha, favoritos, retroceder) conforme a rota ativa
             WeatherTopBar(
                 title = if (!isBaseScreen && currentScreen == Screen.Detail) {
                     val dateArg = navBackStackEntry?.arguments?.getString(Screen.Detail.ARG_DATE)
@@ -58,15 +60,15 @@ fun WeatherApp(
                     navController.popBackStack()
                 },
                 onShareClick = {
-                    viewModel.shareCurrentWeather(context)
+                    homeViewModel.shareCurrentWeather(context)
                 },
                 onBookmarkClick = {
-                    viewModel.toggleFavoriteCurrentCity()
+                    homeViewModel.toggleFavoriteCurrentCity()
                 }
             )
         },
         bottomBar = {
-            // A barra inferior é visível apenas nos ecrãs base
+            // A barra inferior é visível apenas nos ecrãs de nível raiz, preservando o estado de navegação
             if (isBaseScreen) {
                 WeatherBottomBar(
                     currentRoute = currentRoute,
@@ -90,18 +92,19 @@ fun WeatherApp(
         ) {
             composable(Screen.Home.route) {
                 HomeScreen(
-                    viewModel = viewModel,
+                    viewModel = homeViewModel,
                     onNavigateToDetail = { day ->
-                        viewModel.selectForecastDay(day)
                         navController.navigate(Screen.Detail.createRoute(day.date))
                     }
                 )
             }
 
             composable(Screen.Favorites.route) {
+                val favoritesViewModel: FavoritesViewModel = viewModel()
                 FavoritesScreen(
-                    viewModel = viewModel,
-                    onCitySelected = {
+                    viewModel = favoritesViewModel,
+                    onCitySelected = { city ->
+                        homeViewModel.searchWeather(city)
                         navController.navigate(Screen.Home.route) {
                             popUpTo(Screen.Home.route) { inclusive = false }
                             launchSingleTop = true
@@ -117,8 +120,9 @@ fun WeatherApp(
                 )
             ) { backStackEntry ->
                 val date = backStackEntry.arguments?.getString(Screen.Detail.ARG_DATE) ?: ""
+                val detailViewModel: ForecastDetailViewModel = viewModel()
                 ForecastDetailScreen(
-                    viewModel = viewModel,
+                    viewModel = detailViewModel,
                     dayDate = date
                 )
             }

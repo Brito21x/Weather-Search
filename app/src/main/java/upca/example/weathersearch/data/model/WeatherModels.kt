@@ -4,27 +4,24 @@ import com.google.gson.annotations.SerializedName
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-// DTO para a resposta da WeatherAPI
+// DTOs mapeados diretamente da resposta JSON da WeatherAPI
 data class WeatherApiResponse(
     @SerializedName("location") val location: LocationDto? = null,
     @SerializedName("current") val current: CurrentDto? = null,
     @SerializedName("forecast") val forecast: ForecastDto? = null
 )
 
-// DTO com os dados de localização
 data class LocationDto(
     @SerializedName("name") val name: String? = null,
     @SerializedName("region") val region: String? = null,
     @SerializedName("country") val country: String? = null
 )
 
-// DTO com a condição e ícone meteorológico
 data class ConditionDto(
     @SerializedName("text") val text: String? = null,
     @SerializedName("icon") val icon: String? = null
 )
 
-// DTO com as métricas do tempo atual
 data class CurrentDto(
     @SerializedName("temp_c") val tempC: Double? = null,
     @SerializedName("feelslike_c") val feelsLikeC: Double? = null,
@@ -33,18 +30,15 @@ data class CurrentDto(
     @SerializedName("humidity") val humidity: Int? = null
 )
 
-// DTO com a lista de dias de previsão
 data class ForecastDto(
     @SerializedName("forecastday") val forecastday: List<ForecastDayDto>? = null
 )
 
-// DTO de cada dia da previsão
 data class ForecastDayDto(
     @SerializedName("date") val date: String? = null,
     @SerializedName("day") val day: DayDto? = null
 )
 
-// DTO com os dados básicos do dia da previsão
 data class DayDto(
     @SerializedName("maxtemp_c") val maxTempC: Double? = null,
     @SerializedName("mintemp_c") val minTempC: Double? = null,
@@ -55,7 +49,7 @@ data class DayDto(
     @SerializedName("condition") val condition: ConditionDto? = null
 )
 
-// Modelo de domínio para o tempo atual e previsão
+// Modelos de Domínio limpos consumidos pela UI (isolam a UI das alterações na estrutura da API)
 data class WeatherDomain(
     val cityName: String,
     val country: String,
@@ -68,7 +62,6 @@ data class WeatherDomain(
     val forecastDays: List<ForecastDayDomain>
 )
 
-// Modelo de domínio com dados básicos do dia de previsão
 data class ForecastDayDomain(
     val dayIndex: Int,
     val dayLabel: String,
@@ -84,13 +77,13 @@ data class ForecastDayDomain(
     val humidity: Int
 )
 
-// Garante o prefixo https nos ícones da WeatherAPI
+// A WeatherAPI devolve URLs protocol-relative ("//..."), convertendo-os para HTTPS explícito
 fun sanitizeIconUrl(rawUrl: String?): String {
     if (rawUrl.isNullOrBlank()) return ""
     return if (rawUrl.startsWith("//")) "https:$rawUrl" else rawUrl
 }
 
-// Converte a data da API para dia da semana legível em português
+// Converte a data (yyyy-MM-dd) para formato por extenso em português (ex: "Quarta-feira, 18 de Novembro")
 fun formatDateToDayOfWeek(dateString: String?): String {
     if (dateString.isNullOrBlank()) return ""
     return try {
@@ -103,12 +96,13 @@ fun formatDateToDayOfWeek(dateString: String?): String {
     }
 }
 
-// Mapeia DTOs da API para o modelo de domínio da aplicação
+// Converte os dados brutos da API em modelos de domínio prontos e seguros para a interface
 fun WeatherApiResponse.toDomain(): WeatherDomain {
     val loc = this.location
     val cur = this.current
 
     val daysDomain = this.forecast?.forecastday?.mapIndexed { index, dayDto ->
+        // Define rótulos contextuais para os primeiros dias em vez da data crua
         val label = when (index) {
             0 -> "Hoje"
             1 -> "Amanhã"

@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import upca.example.weathersearch.ui.theme.AlertRed
 import upca.example.weathersearch.ui.theme.WeatherSearchTheme
 
-// Componente para estado de carregamento assíncrono
 @Composable
 fun LoadingView(
     modifier: Modifier = Modifier,
@@ -54,7 +53,6 @@ fun LoadingView(
     }
 }
 
-// Componente para estado de erro com botão de repetição
 @Composable
 fun ErrorView(
     message: String,
@@ -103,10 +101,8 @@ fun ErrorView(
     }
 }
 
-// Componente para estado inicial ou lista vazia antes de pesquisa
 @Composable
 fun EmptyView(
-    onCityClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -139,7 +135,6 @@ fun EmptyView(
     }
 }
 
-// Pré-visualização do estado de carregamento
 @Preview(showBackground = true)
 @Composable
 fun LoadingViewPreview() {
@@ -148,7 +143,6 @@ fun LoadingViewPreview() {
     }
 }
 
-// Pré-visualização do estado de erro
 @Preview(showBackground = true)
 @Composable
 fun ErrorViewPreview() {
@@ -160,11 +154,10 @@ fun ErrorViewPreview() {
     }
 }
 
-// Pré-visualização do estado vazio
 @Preview(showBackground = true)
 @Composable
 fun EmptyViewPreview() {
     WeatherSearchTheme {
-        EmptyView(onCityClick = {})
+        EmptyView()
     }
 }

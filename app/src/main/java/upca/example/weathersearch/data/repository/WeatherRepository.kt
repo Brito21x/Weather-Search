@@ -8,25 +8,28 @@ import kotlinx.coroutines.flow.asStateFlow
 import upca.example.weathersearch.data.model.WeatherDomain
 import upca.example.weathersearch.data.network.WeatherApiClient
 
-// Repositório que coordena os pedidos de rede OkHttp e a persistência local
-class WeatherRepository(
+// Ponto único de acesso a dados (Singleton): partilhado entre os diferentes ViewModels da aplicação
+class WeatherRepository private constructor(
     context: Context,
     private val apiClient: WeatherApiClient = WeatherApiClient()
 ) {
     private val prefs: SharedPreferences =
         context.getSharedPreferences("weather_search_prefs", Context.MODE_PRIVATE)
 
-    // StateFlow com o conjunto de cidades favoritas
+    // StateFlow observável que notifica a UI de alterações imediatas na lista de favoritos
     private val _favoriteCities = MutableStateFlow<Set<String>>(loadFavorites())
     val favoriteCities: StateFlow<Set<String>> = _favoriteCities.asStateFlow()
 
-    // Carrega a lista de favoritos de SharedPreferences com fallback padrão
+    // Guarda a última previsão meteorológica obtida para partilha entre ecrãs (ex: detalhe)
+    private val _currentWeather = MutableStateFlow<WeatherDomain?>(null)
+    val currentWeather: StateFlow<WeatherDomain?> = _currentWeather.asStateFlow()
+
     private fun loadFavorites(): Set<String> {
         val saved = prefs.getStringSet(KEY_FAVORITES, null)
         return saved?.toSet() ?: setOf("Barcelos", "Braga", "Porto")
     }
 
-    // Alterna o estado de favorito de uma localidade e persiste as alterações
+    // Adiciona ou remove a cidade (case-insensitive), sincronizando a memória e o armazenamento local
     fun toggleFavorite(cityName: String) {
         val current = _favoriteCities.value.toMutableSet()
         val normalized = cityName.trim()
@@ -41,12 +44,10 @@ class WeatherRepository(
         prefs.edit().putStringSet(KEY_FAVORITES, current).apply()
     }
 
-    // Verifica se a cidade indicada já se encontra na lista de favoritos
     fun isFavorite(cityName: String): Boolean {
         return _favoriteCities.value.any { it.equals(cityName.trim(), ignoreCase = true) }
     }
 
-    // Encaminha o pedido de previsão meteorológica para o cliente OkHttp
     fun fetchWeather(
         query: String,
         days: Int = 5,
@@ -56,12 +57,24 @@ class WeatherRepository(
         apiClient.fetchForecastAsync(
             query = query,
             days = days,
-            onSuccess = onSuccess,
+            onSuccess = { domain ->
+                _currentWeather.value = domain
+                onSuccess(domain)
+            },
             onError = onError
         )
     }
 
     companion object {
         private const val KEY_FAVORITES = "key_favorite_cities"
+
+        @Volatile
+        private var INSTANCE: WeatherRepository? = null
+
+        fun getInstance(context: Context): WeatherRepository {
+            return INSTANCE ?: synchronized(this) {
+                INSTANCE ?: WeatherRepository(context.applicationContext).also { INSTANCE = it }
+            }
+        }
     }
 }

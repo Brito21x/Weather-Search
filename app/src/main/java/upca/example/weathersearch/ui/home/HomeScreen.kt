@@ -60,10 +60,9 @@ import upca.example.weathersearch.ui.components.ForecastDayRow
 import upca.example.weathersearch.ui.components.LoadingView
 import upca.example.weathersearch.ui.theme.WeatherSearchTheme
 
-// Ecrã principal com recolha de estado do ViewModel e navegação de detalhe
 @Composable
 fun HomeScreen(
-    viewModel: WeatherViewModel,
+    viewModel: HomeViewModel,
     onNavigateToDetail: (ForecastDayDomain) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -73,10 +72,9 @@ fun HomeScreen(
     val uiState by viewModel.uiState.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
 
-    // Sugestões de acesso rápido com cidades de Portugal
     val quickCities = listOf("Barcelos", "Braga", "Porto", "Lisboa", "Coimbra", "Faro", "Funchal")
 
-    // Launcher para pedido de permissões de localização GPS
+    // Gestor do pedido de permissões de localização (Fine e Coarse GPS) em tempo de execução
     val locationPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
@@ -110,6 +108,7 @@ fun HomeScreen(
         },
         onGpsClick = {
             focusManager.clearFocus()
+            // Se as permissões já estiverem concedidas, obtém a localização; caso contrário, abre o diálogo de permissões
             val fineCheck = ContextCompat.checkSelfPermission(
                 context,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -146,7 +145,6 @@ fun HomeScreen(
     )
 }
 
-// Conteúdo desacoplado da HomeScreen para suporte a pré-visualização no Compose
 @Composable
 fun HomeScreenContent(
     searchQuery: String,
@@ -166,7 +164,6 @@ fun HomeScreenContent(
             .fillMaxSize()
             .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
-        // Barra de pesquisa com caixa de texto e botão de localização GPS
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
@@ -224,7 +221,6 @@ fun HomeScreenContent(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Chips de seleção rápida para cidades de Portugal
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -245,12 +241,12 @@ fun HomeScreenContent(
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        // Apresentação condicional do estado da UI com limites explícitos de altura
+        // Renderização declarativa consoante o estado atual da UI
         when (uiState) {
             is WeatherUiState.Loading -> {
                 LoadingView(
                     modifier = Modifier.weight(1f),
-                    message = "A obter dados meteorológicos com OkHttp..."
+                    message = "A obter dados meteorológicos..."
                 )
             }
 
@@ -264,7 +260,6 @@ fun HomeScreenContent(
 
             is WeatherUiState.Empty -> {
                 EmptyView(
-                    onCityClick = onCityQuickClick,
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -272,7 +267,6 @@ fun HomeScreenContent(
             is WeatherUiState.Success -> {
                 val weather = uiState.weather
 
-                // Lista de previsão diária com suporte seguro a preview
                 LazyColumn(
                     modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -317,7 +311,7 @@ fun HomeScreenContent(
     }
 }
 
-// Obtém a localização GPS ou de rede no dispositivo
+// Obtém as coordenadas GPS via FusedLocationProviderClient com salvaguarda no LocationManager padrão
 @SuppressLint("MissingPermission")
 private fun requestDeviceLocation(
     context: Context,
@@ -352,8 +346,7 @@ private fun requestDeviceLocation(
     }
 }
 
-// Pré-visualização do ecrã principal com estado de sucesso preenchido
-@Preview(showBackground = true, heightDp = 800)
+@Preview(showBackground = true, name = "HomeScreen Sucesso", heightDp = 800)
 @Composable
 fun HomeScreenPreview() {
     WeatherSearchTheme {
@@ -401,6 +394,44 @@ fun HomeScreenPreview() {
                     )
                 )
             ),
+            quickCities = listOf("Barcelos", "Braga", "Porto", "Lisboa"),
+            onQueryChange = {},
+            onSearch = {},
+            onClearQuery = {},
+            onGpsClick = {},
+            onCityQuickClick = {},
+            onRetry = {},
+            onForecastDayClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "HomeScreen Vazio", heightDp = 800)
+@Composable
+fun HomeScreenEmptyPreview() {
+    WeatherSearchTheme {
+        HomeScreenContent(
+            searchQuery = "",
+            uiState = WeatherUiState.Empty,
+            quickCities = listOf("Barcelos", "Braga", "Porto", "Lisboa"),
+            onQueryChange = {},
+            onSearch = {},
+            onClearQuery = {},
+            onGpsClick = {},
+            onCityQuickClick = {},
+            onRetry = {},
+            onForecastDayClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "HomeScreen Carregamento", heightDp = 800)
+@Composable
+fun HomeScreenLoadingPreview() {
+    WeatherSearchTheme {
+        HomeScreenContent(
+            searchQuery = "Barcelos",
+            uiState = WeatherUiState.Loading,
             quickCities = listOf("Barcelos", "Braga", "Porto", "Lisboa"),
             onQueryChange = {},
             onSearch = {},
