@@ -27,7 +27,6 @@ import upca.example.weathersearch.ui.detail.ForecastDetailScreen
 import upca.example.weathersearch.ui.favorites.FavoritesScreen
 import upca.example.weathersearch.ui.home.HomeScreen
 import upca.example.weathersearch.ui.home.HomeViewModel
-import upca.example.weathersearch.ui.home.HomeUiState
 import upca.example.weathersearch.ui.theme.WeatherSearchTheme
 
 class MainActivity : ComponentActivity() {
@@ -42,6 +41,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+// Estrutura principal da aplicação: coordena Scaffold, TopBar adaptativa, BottomBar e o grafo de rotas
 @Composable
 fun WeatherApp(
     navController: NavHostController = rememberNavController(),
@@ -53,7 +53,7 @@ fun WeatherApp(
     val currentScreen = Screen.fromRoute(currentRoute)
     val homeUiState by homeViewModel.uiState.collectAsState()
     val isBookmarked by homeViewModel.isCurrentCityBookmarked.collectAsState()
-    val canShareOrBookmark = currentScreen == Screen.Home && homeUiState is HomeUiState.Success
+    val canShareOrBookmark = currentScreen == Screen.Home && homeUiState.weather != null && !homeUiState.isLoading
 
     Scaffold(
         topBar = {

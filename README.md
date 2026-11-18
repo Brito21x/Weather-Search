@@ -181,7 +181,7 @@ GET https://api.weatherapi.com/v1/forecast.json?key={API_KEY}&q={CIDADE}&days={D
 - [x] Exibição de coleções com **`LazyColumn`** e itens reutilizáveis (**`ForecastDayRow`**).
 - [x] Modelagem de dados de domínio desacoplados da camada de rede (**`WeatherDomain`**, **`ForecastDayDomain`**).
 - [x] Navegação de um item da lista para um ecrã de detalhe (**`ForecastDetailScreen`**) com dados do item selecionado.
-- [x] Tratamento determinístico de estados de interface: *Empty*, *Loading*, *Success* e *Error* via **`HomeUiState`**.
+- [x] Tratamento determinístico de estados de interface via **`HomeViewState`** (*searchQuery*, *weather*, *errorMessage*, *isLoading*).
 - [x] Separação do Composable da linha da lista e do ecrã de detalhe em ficheiros e pacotes modulares distintos.
 
 ### 3. Navegação Multi-Ecrã com Navigation Compose
@@ -234,16 +234,15 @@ app/src/main/java/upca/example/weathersearch/
 │   │
 │   ├── detail/                     # Ecrã de detalhe
 │   │   ├── ForecastDetailScreen.kt # Ecrã com dados meteorológicos detalhados do dia
-│   │   └── ForecastDetailViewModel.kt # ViewModel dedicado aos detalhes
+│   │   └── ForecastDetailViewModel.kt # ViewModel e ForecastDetailViewState
 │   │
 │   ├── favorites/                  # Ecrã de cidades guardadas
 │   │   ├── FavoritesScreen.kt      # Ecrã de listagem e remoção de favoritos
-│   │   └── FavoritesViewModel.kt   # ViewModel dedicado à gestão de favoritos
+│   │   └── FavoritesViewModel.kt   # ViewModel e FavoritesViewState
 │   │
 │   ├── home/                       # Ecrã principal da aplicação
 │   │   ├── HomeScreen.kt           # Ecrã principal com pesquisa e LazyColumn
-│   │   ├── HomeUiState.kt          # Sealed interface com os estados da UI da Home
-│   │   └── HomeViewModel.kt        # ViewModel dedicado à pesquisa meteorológica
+│   │   └── HomeViewModel.kt        # ViewModel e HomeViewState
 │   │
 │   └── theme/                      # Tema visual e design system Material 3
 │       ├── Color.kt                # Paleta de cores do Weather Search

@@ -52,14 +52,14 @@ fun ForecastDetailScreen(
     modifier: Modifier = Modifier,
     viewModel: ForecastDetailViewModel = viewModel()
 ) {
-    val selectedDay by viewModel.selectedForecastDay.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(dayDate) {
         viewModel.loadForecastDayByDate(dayDate)
     }
 
     ForecastDetailContent(
-        forecastDay = selectedDay,
+        forecastDay = uiState.forecastDay,
         modifier = modifier
     )
 }

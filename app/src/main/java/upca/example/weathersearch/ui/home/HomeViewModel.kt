@@ -9,7 +9,16 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
+import upca.example.weathersearch.data.model.WeatherDomain
 import upca.example.weathersearch.data.repository.WeatherRepository
+
+data class HomeViewState(
+    val searchQuery: String = "Barcelos",
+    val weather: WeatherDomain? = null,
+    val errorMessage: String? = null,
+    val isLoading: Boolean = false
+)
 
 class HomeViewModel(
     application: Application
@@ -17,18 +26,16 @@ class HomeViewModel(
 
     private val repository = WeatherRepository.getInstance(application.applicationContext)
 
-    private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Empty)
-    val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
-
-    private val _searchQuery = MutableStateFlow("Barcelos")
-    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
+    private val _uiState = MutableStateFlow(HomeViewState())
+    val uiState: StateFlow<HomeViewState> = _uiState.asStateFlow()
 
     val isCurrentCityBookmarked: StateFlow<Boolean> = combine(
         _uiState,
         repository.favoriteCities
     ) { state, favorites ->
-        if (state is HomeUiState.Success) {
-            favorites.any { it.equals(state.weather.cityName.trim(), ignoreCase = true) }
+        val city = state.weather?.cityName?.trim()
+        if (!city.isNullOrBlank()) {
+            favorites.any { it.equals(city, ignoreCase = true) }
         } else {
             false
         }
@@ -41,28 +48,27 @@ class HomeViewModel(
     }
 
     fun onQueryChange(newQuery: String) {
-        _searchQuery.value = newQuery
+        _uiState.update { it.copy(searchQuery = newQuery) }
     }
 
     fun searchWeather(cityName: String) {
         val trimmed = cityName.trim()
         if (trimmed.isBlank()) {
-            _uiState.value = HomeUiState.Error("Por favor escreva o nome de uma localidade.")
+            _uiState.update { it.copy(errorMessage = "Por favor escreva o nome de uma localidade.", isLoading = false) }
             return
         }
 
         lastQueriedLocation = trimmed
-        _searchQuery.value = trimmed
-        _uiState.value = HomeUiState.Loading
+        _uiState.update { it.copy(searchQuery = trimmed, isLoading = true, errorMessage = null) }
 
         repository.fetchWeather(
             query = trimmed,
             days = 5,
             onSuccess = { domain ->
-                _uiState.value = HomeUiState.Success(domain)
+                _uiState.update { it.copy(weather = domain, isLoading = false, errorMessage = null) }
             },
             onError = { errorMessage ->
-                _uiState.value = HomeUiState.Error(errorMessage)
+                _uiState.update { it.copy(errorMessage = errorMessage, isLoading = false) }
             }
         )
     }
@@ -70,17 +76,16 @@ class HomeViewModel(
     fun searchByCoordinates(lat: Double, lon: Double) {
         val query = "$lat,$lon"
         lastQueriedLocation = query
-        _uiState.value = HomeUiState.Loading
+        _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
         repository.fetchWeather(
             query = query,
             days = 5,
             onSuccess = { domain ->
-                _searchQuery.value = domain.cityName
-                _uiState.value = HomeUiState.Success(domain)
+                _uiState.update { it.copy(searchQuery = domain.cityName, weather = domain, isLoading = false, errorMessage = null) }
             },
             onError = { errorMessage ->
-                _uiState.value = HomeUiState.Error(errorMessage)
+                _uiState.update { it.copy(errorMessage = errorMessage, isLoading = false) }
             }
         )
     }
@@ -90,13 +95,12 @@ class HomeViewModel(
     }
 
     fun toggleFavoriteCurrentCity() {
-        val currentSuccess = _uiState.value as? HomeUiState.Success ?: return
-        repository.toggleFavorite(currentSuccess.weather.cityName)
+        val weather = _uiState.value.weather ?: return
+        repository.toggleFavorite(weather.cityName)
     }
 
     fun getShareSummary(): String? {
-        val currentSuccess = _uiState.value as? HomeUiState.Success ?: return null
-        val weather = currentSuccess.weather
+        val weather = _uiState.value.weather ?: return null
 
         return buildString {
             append("Previsão do Tempo para ${weather.cityName}, ${weather.country}:\n")

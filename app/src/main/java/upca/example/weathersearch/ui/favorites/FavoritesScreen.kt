@@ -41,10 +41,10 @@ fun FavoritesScreen(
     modifier: Modifier = Modifier,
     viewModel: FavoritesViewModel = viewModel()
 ) {
-    val favorites by viewModel.favoriteCities.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
 
     FavoritesContent(
-        favorites = favorites,
+        favorites = uiState.favoriteCities,
         onCityClick = onCitySelected,
         onDeleteClick = viewModel::removeFavorite,
         modifier = modifier

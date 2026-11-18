@@ -74,7 +74,6 @@ fun HomeScreen(
     val focusManager = LocalFocusManager.current
 
     val uiState by viewModel.uiState.collectAsState()
-    val searchQuery by viewModel.searchQuery.collectAsState()
 
     // Gestor do pedido de permissões de localização (Fine e Coarse GPS) em tempo de execução
     val locationPermissionLauncher = rememberLauncherForActivityResult(
@@ -97,13 +96,13 @@ fun HomeScreen(
     }
 
     HomeScreenContent(
-        searchQuery = searchQuery,
+        searchQuery = uiState.searchQuery,
         uiState = uiState,
         quickCities = QUICK_CITIES,
         onQueryChange = { viewModel.onQueryChange(it) },
         onSearch = {
             focusManager.clearFocus()
-            viewModel.searchWeather(searchQuery)
+            viewModel.searchWeather(uiState.searchQuery)
         },
         onClearQuery = {
             viewModel.onQueryChange("")
@@ -150,7 +149,7 @@ fun HomeScreen(
 @Composable
 fun HomeScreenContent(
     searchQuery: String,
-    uiState: HomeUiState,
+    uiState: HomeViewState,
     quickCities: List<String>,
     onQueryChange: (String) -> Unit,
     onSearch: () -> Unit,
@@ -244,29 +243,23 @@ fun HomeScreenContent(
         Spacer(modifier = Modifier.height(10.dp))
 
         // Renderização declarativa consoante o estado atual da UI
-        when (uiState) {
-            is HomeUiState.Loading -> {
+        when {
+            uiState.isLoading -> {
                 LoadingView(
                     modifier = Modifier.weight(1f),
                     message = "A obter dados meteorológicos..."
                 )
             }
 
-            is HomeUiState.Error -> {
+            uiState.errorMessage != null -> {
                 ErrorView(
-                    message = uiState.message,
+                    message = uiState.errorMessage,
                     onRetry = onRetry,
                     modifier = Modifier.weight(1f)
                 )
             }
 
-            is HomeUiState.Empty -> {
-                EmptyView(
-                    modifier = Modifier.weight(1f)
-                )
-            }
-
-            is HomeUiState.Success -> {
+            uiState.weather != null -> {
                 val weather = uiState.weather
 
                 LazyColumn(
@@ -308,6 +301,12 @@ fun HomeScreenContent(
                         Spacer(modifier = Modifier.height(20.dp))
                     }
                 }
+            }
+
+            else -> {
+                EmptyView(
+                    modifier = Modifier.weight(1f)
+                )
             }
         }
     }
@@ -354,7 +353,8 @@ fun HomeScreenPreview() {
     WeatherSearchTheme {
         HomeScreenContent(
             searchQuery = "Barcelos",
-            uiState = HomeUiState.Success(
+            uiState = HomeViewState(
+                searchQuery = "Barcelos",
                 weather = WeatherDomain(
                     cityName = "Barcelos",
                     country = "Portugal",
@@ -394,7 +394,8 @@ fun HomeScreenPreview() {
                             humidity = 82
                         )
                     )
-                )
+                ),
+                isLoading = false
             ),
             quickCities = listOf("Barcelos", "Braga", "Porto", "Lisboa"),
             onQueryChange = {},
@@ -414,7 +415,7 @@ fun HomeScreenEmptyPreview() {
     WeatherSearchTheme {
         HomeScreenContent(
             searchQuery = "",
-            uiState = HomeUiState.Empty,
+            uiState = HomeViewState(searchQuery = "", weather = null, isLoading = false),
             quickCities = listOf("Barcelos", "Braga", "Porto", "Lisboa"),
             onQueryChange = {},
             onSearch = {},
@@ -433,7 +434,7 @@ fun HomeScreenLoadingPreview() {
     WeatherSearchTheme {
         HomeScreenContent(
             searchQuery = "Barcelos",
-            uiState = HomeUiState.Loading,
+            uiState = HomeViewState(searchQuery = "Barcelos", isLoading = true),
             quickCities = listOf("Barcelos", "Braga", "Porto", "Lisboa"),
             onQueryChange = {},
             onSearch = {},
