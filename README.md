@@ -105,7 +105,7 @@ A aplicação consome a API REST da **WeatherAPI**, processando os dados meteoro
           <li><strong>Lista de Favoritos</strong>: Cidades guardadas localmente pelo utilizador (<em>Barcelos, Braga, Faro</em>).</li>
           <li><strong>Consulta Imediata</strong>: Ao tocar em qualquer cartão, a aplicação carrega a previsão do tempo dessa cidade.</li>
           <li><strong>Eliminação Rápida</strong>: Botão de eliminação direta para gerir a lista de localidades guardadas.</li>
-          <li><strong>Navegação Persistente</strong>: Barra inferior com <code>NavigationBar</code> e preservação de rota via <code>rememberSaveable</code>.</li>
+          <li><strong>Navegação Reativa</strong>: Barra inferior com <code>NavigationBar</code> e sincronização direta com a rota ativa do <code>NavController</code>.</li>
         </ul>
       </td>
     </tr>
@@ -156,7 +156,7 @@ GET https://api.weatherapi.com/v1/forecast.json?key={API_KEY}&q={CIDADE}&days={D
 
 | Parâmetro | Detalhe |
 | :--- | :--- |
-| **Arquitetura** | MVVM (Model-View-ViewModel) + Unidirectional Data Flow (UDF) |
+| **Arquitetura** | MVVM modular (Package-by-Feature) + Repository Pattern + Unidirectional Data Flow (UDF) |
 | **Toolkit de UI** | 100% Jetpack Compose com Material Design 3 |
 | **Linguagem** | Kotlin 2.2.10 |
 | **Cliente de Rede** | OkHttp 4.12.0 (Chamadas assíncronas via `enqueue`) |
@@ -174,29 +174,31 @@ GET https://api.weatherapi.com/v1/forecast.json?key={API_KEY}&q={CIDADE}&days={D
 - [x] Configuração da dependência **OkHttp** e permissão `android.permission.INTERNET`.
 - [x] Execução de pedidos HTTP GET de forma assíncrona fora da Main Thread através de **`enqueue()`**.
 - [x] Processamento de respostas JSON e mapeamento para modelos Kotlin tipados com **Gson**.
-- [x] Exposição do resultado à Compose UI via **`ViewModel`** e **`StateFlow`** consumidos com **`collectAsState()`**.
+- [x] Exposição do resultado à Compose UI via ViewModels dedicados por ecrã (**`HomeViewModel`**, **`FavoritesViewModel`**, **`ForecastDetailViewModel`**) e **`StateFlow`** consumidos com **`collectAsState()`**.
 - [x] Tratamento robusto de falhas de rede (DNS, timeout, perda de ligação) e códigos HTTP inesperados.
 
 ### 2. Padrão Lista → Detalhe em Compose
 - [x] Exibição de coleções com **`LazyColumn`** e itens reutilizáveis (**`ForecastDayRow`**).
 - [x] Modelagem de dados de domínio desacoplados da camada de rede (**`WeatherDomain`**, **`ForecastDayDomain`**).
 - [x] Navegação de um item da lista para um ecrã de detalhe (**`ForecastDetailScreen`**) com dados do item selecionado.
-- [x] Tratamento de estados de interface: *Loading*, *Error*, *Empty* e *Success*.
-- [x] Separação do Composable da linha da lista e do ecrã de detalhe em ficheiros e funções distintas.
+- [x] Tratamento determinístico de estados de interface: *Empty*, *Loading*, *Success* e *Error* via **`HomeUiState`**.
+- [x] Separação do Composable da linha da lista e do ecrã de detalhe em ficheiros e pacotes modulares distintos.
 
 ### 3. Navegação Multi-Ecrã com Navigation Compose
 - [x] Definição de rotas tipadas através de **`sealed class Screen`** e grafo com **`NavHost`** / **`NavController`**.
 - [x] Organização estrutural com **`Scaffold`** (`topBar`, `bottomBar`, conteúdo).
-- [x] Barra de navegação inferior com **`NavigationBar`** e **`NavigationBarItem`**.
-- [x] Barra superior dinâmica (**`WeatherTopBar`**) com título adaptativo, botão voltar e ações de partilha e favoritos.
+- [x] Barra de navegação inferior com **`NavigationBar`** e **`NavigationBarItem`** sincronizada com o estado da rota atual.
+- [x] Barra superior dinâmica (**`WeatherTopBar`**) com título adaptativo, botão voltar e ações reativas de partilha e favoritos.
 - [x] Distinção de ecrãs base e ecrãs de detalhe (`isBaseScreen`, `popBackStack()`).
-- [x] Preservação de seleção da barra inferior com **`rememberSaveable`**.
 
 ---
 
 ## 💡 Boas Práticas de Engenharia
 * **Zero Bloqueios na Main Thread**: Todo o processamento de rede e parsing de dados corre em threads secundárias do pool do OkHttp.
-* **Single Source of Truth (SSOT)**: O estado da interface é centralizado em `StateFlow` imutáveis expostos pelo `WeatherViewModel`.
+* **Single Source of Truth (SSOT)**: O repositório central (`WeatherRepository`) é a única fonte de verdade para cache em memória e persistência local, evitando duplicação de dados.
+* **Arquitetura Modular por Funcionalidade (Package-by-Feature)**: Cada ecrã possui o seu próprio ViewModel e estado (`ui/home`, `ui/favorites`, `ui/detail`), eliminando o anti-padrão do "God ViewModel" e garantindo escalabilidade.
+* **Desacoplamento Rigoroso da Camada de UI**: Os ViewModels são puros e não retêm referências a `Context` nem constroem `Intent`s; a abertura do sistema de partilha nativo é orquestrada na camada de UI.
+* **Reatividade com Kotlin Coroutines & Flow**: Uso de `StateFlow` e do operador `combine` para reatividade imediata no ícone de favoritos da barra superior.
 * **Suporte a Previews no Android Studio**: Todos os componentes visuais contêm funções `@Preview` operacionais (sem falhas de LayoutLib por recurso ao `LocalInspectionMode`).
 * **Design Edge-to-Edge**: Aplicação configurada com `enableEdgeToEdge()` para integração total com barras de estado e navegação do sistema.
 * **Ícones Adaptativos**: Ícone oficial com suporte a máscaras dinâmicas (círculo, quadrado e squircle) em Android 8.0+.
