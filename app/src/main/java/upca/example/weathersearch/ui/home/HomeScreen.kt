@@ -50,6 +50,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.android.gms.location.LocationServices
 import upca.example.weathersearch.data.model.ForecastDayDomain
 import upca.example.weathersearch.data.model.WeatherDomain
@@ -60,19 +61,20 @@ import upca.example.weathersearch.ui.components.ForecastDayRow
 import upca.example.weathersearch.ui.components.LoadingView
 import upca.example.weathersearch.ui.theme.WeatherSearchTheme
 
+// Lista de cidades rápidas declarada no topo para evitar alocações de memória a cada recomposição
+private val QUICK_CITIES = listOf("Barcelos", "Braga", "Porto", "Lisboa", "Coimbra", "Faro", "Funchal")
+
 @Composable
 fun HomeScreen(
-    viewModel: HomeViewModel,
     onNavigateToDetail: (ForecastDayDomain) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: HomeViewModel = viewModel()
 ) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
 
     val uiState by viewModel.uiState.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
-
-    val quickCities = listOf("Barcelos", "Braga", "Porto", "Lisboa", "Coimbra", "Faro", "Funchal")
 
     // Gestor do pedido de permissões de localização (Fine e Coarse GPS) em tempo de execução
     val locationPermissionLauncher = rememberLauncherForActivityResult(
@@ -97,7 +99,7 @@ fun HomeScreen(
     HomeScreenContent(
         searchQuery = searchQuery,
         uiState = uiState,
-        quickCities = quickCities,
+        quickCities = QUICK_CITIES,
         onQueryChange = { viewModel.onQueryChange(it) },
         onSearch = {
             focusManager.clearFocus()
@@ -148,7 +150,7 @@ fun HomeScreen(
 @Composable
 fun HomeScreenContent(
     searchQuery: String,
-    uiState: WeatherUiState,
+    uiState: HomeUiState,
     quickCities: List<String>,
     onQueryChange: (String) -> Unit,
     onSearch: () -> Unit,
@@ -243,14 +245,14 @@ fun HomeScreenContent(
 
         // Renderização declarativa consoante o estado atual da UI
         when (uiState) {
-            is WeatherUiState.Loading -> {
+            is HomeUiState.Loading -> {
                 LoadingView(
                     modifier = Modifier.weight(1f),
                     message = "A obter dados meteorológicos..."
                 )
             }
 
-            is WeatherUiState.Error -> {
+            is HomeUiState.Error -> {
                 ErrorView(
                     message = uiState.message,
                     onRetry = onRetry,
@@ -258,13 +260,13 @@ fun HomeScreenContent(
                 )
             }
 
-            is WeatherUiState.Empty -> {
+            is HomeUiState.Empty -> {
                 EmptyView(
                     modifier = Modifier.weight(1f)
                 )
             }
 
-            is WeatherUiState.Success -> {
+            is HomeUiState.Success -> {
                 val weather = uiState.weather
 
                 LazyColumn(
@@ -352,7 +354,7 @@ fun HomeScreenPreview() {
     WeatherSearchTheme {
         HomeScreenContent(
             searchQuery = "Barcelos",
-            uiState = WeatherUiState.Success(
+            uiState = HomeUiState.Success(
                 weather = WeatherDomain(
                     cityName = "Barcelos",
                     country = "Portugal",
@@ -412,7 +414,7 @@ fun HomeScreenEmptyPreview() {
     WeatherSearchTheme {
         HomeScreenContent(
             searchQuery = "",
-            uiState = WeatherUiState.Empty,
+            uiState = HomeUiState.Empty,
             quickCities = listOf("Barcelos", "Braga", "Porto", "Lisboa"),
             onQueryChange = {},
             onSearch = {},
@@ -431,7 +433,7 @@ fun HomeScreenLoadingPreview() {
     WeatherSearchTheme {
         HomeScreenContent(
             searchQuery = "Barcelos",
-            uiState = WeatherUiState.Loading,
+            uiState = HomeUiState.Loading,
             quickCities = listOf("Barcelos", "Braga", "Porto", "Lisboa"),
             onQueryChange = {},
             onSearch = {},

@@ -1,5 +1,6 @@
 package upca.example.weathersearch.navigation
 
+import android.content.Intent
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -21,7 +22,7 @@ import upca.example.weathersearch.ui.detail.ForecastDetailScreen
 import upca.example.weathersearch.ui.favorites.FavoritesScreen
 import upca.example.weathersearch.ui.home.HomeScreen
 import upca.example.weathersearch.ui.home.HomeViewModel
-import upca.example.weathersearch.ui.home.WeatherUiState
+import upca.example.weathersearch.ui.home.HomeUiState
 
 // Estrutura principal da aplicação: coordena Scaffold, TopBar adaptativa, BottomBar e o grafo de rotas
 @Composable
@@ -34,7 +35,8 @@ fun WeatherApp(
     val currentRoute = navBackStackEntry?.destination?.route
     val currentScreen = Screen.fromRoute(currentRoute)
     val homeUiState by homeViewModel.uiState.collectAsState()
-    val canShareOrBookmark = currentScreen == Screen.Home && homeUiState is WeatherUiState.Success
+    val isBookmarked by homeViewModel.isCurrentCityBookmarked.collectAsState()
+    val canShareOrBookmark = currentScreen == Screen.Home && homeUiState is HomeUiState.Success
 
     Scaffold(
         topBar = {
@@ -44,9 +46,18 @@ fun WeatherApp(
                 isBaseScreen = currentScreen.isBaseScreen,
                 canShare = canShareOrBookmark,
                 canBookmark = canShareOrBookmark,
-                isBookmarked = homeViewModel.isCurrentCityBookmarked(),
+                isBookmarked = isBookmarked,
                 onBackClick = { navController.popBackStack() },
-                onShareClick = { homeViewModel.shareCurrentWeather(context) },
+                onShareClick = {
+                    homeViewModel.getShareSummary()?.let { summary ->
+                        val sendIntent = Intent().apply {
+                            action = Intent.ACTION_SEND
+                            putExtra(Intent.EXTRA_TEXT, summary)
+                            type = "text/plain"
+                        }
+                        context.startActivity(Intent.createChooser(sendIntent, "Partilhar Meteorologia"))
+                    }
+                },
                 onBookmarkClick = { homeViewModel.toggleFavoriteCurrentCity() }
             )
         },

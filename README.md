@@ -226,17 +226,23 @@ app/src/main/java/upca/example/weathersearch/
 │   ├── components/                 # Componentes de interface modulares e reutilizáveis
 │   │   ├── CurrentWeatherCard.kt   # Cartão de destaque do tempo atual
 │   │   ├── ForecastDayRow.kt       # Linha da lista de previsão diária
-│   │   ├── WeatherBottomBar.kt     # Barra de navegação inferior com rememberSaveable
+│   │   ├── WeatherBottomBar.kt     # Barra de navegação inferior
 │   │   ├── WeatherIcon.kt          # Ícone com salvaguarda nativa para Previews
 │   │   ├── WeatherStateViews.kt    # Vistas de Loading, Error e Empty
 │   │   └── WeatherTopBar.kt        # Barra superior com ações de voltar, partilhar e favoritar
 │   │
-│   ├── home/                       # Ecrãs principais da aplicação
-│   │   ├── FavoritesScreen.kt      # Ecrã de cidades guardadas
-│   │   ├── ForecastDetailScreen.kt # Ecrã de detalhe com dados básicos do dia
+│   ├── detail/                     # Ecrã de detalhe
+│   │   ├── ForecastDetailScreen.kt # Ecrã com dados meteorológicos detalhados do dia
+│   │   └── ForecastDetailViewModel.kt # ViewModel dedicado aos detalhes
+│   │
+│   ├── favorites/                  # Ecrã de cidades guardadas
+│   │   ├── FavoritesScreen.kt      # Ecrã de listagem e remoção de favoritos
+│   │   └── FavoritesViewModel.kt   # ViewModel dedicado à gestão de favoritos
+│   │
+│   ├── home/                       # Ecrã principal da aplicação
 │   │   ├── HomeScreen.kt           # Ecrã principal com pesquisa e LazyColumn
-│   │   ├── WeatherUiState.kt       # Sealed interface com os estados da UI
-│   │   └── WeatherViewModel.kt     # ViewModel com gestão de StateFlow e coroutines
+│   │   ├── HomeUiState.kt          # Sealed interface com os estados da UI da Home
+│   │   └── HomeViewModel.kt        # ViewModel dedicado à pesquisa meteorológica
 │   │
 │   └── theme/                      # Tema visual e design system Material 3
 │       ├── Color.kt                # Paleta de cores do Weather Search
