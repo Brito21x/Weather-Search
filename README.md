@@ -6,14 +6,16 @@
   <h3>Native Android Weather Forecast Application</h3>
   <p>Built in <strong>Kotlin</strong> with <strong>Jetpack Compose</strong>, asynchronous REST networking via <strong>OkHttp</strong>, and multi-screen navigation using <strong>Navigation Compose</strong>.</p>
 
-  [![Author](https://img.shields.io/badge/Author-Brito21x-blue?logo=github&logoColor=white&style=flat-square)](https://github.com/Brito21x)
-  [![Platform](https://img.shields.io/badge/Platform-Android-3DDC84?logo=android&logoColor=white&style=flat-square)](https://developer.android.com/)
-  [![Kotlin](https://img.shields.io/badge/Kotlin-2.2.10-7F52FF?logo=kotlin&logoColor=white&style=flat-square)](https://kotlinlang.org/)
-  [![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-BOM%202026.02.01-4285F4?logo=android&logoColor=white&style=flat-square)](https://developer.android.com/jetpack/compose)
-  [![Material 3](https://img.shields.io/badge/Material%203-Latest-006686?style=flat-square)](https://m3.material.io/)
-  [![OkHttp](https://img.shields.io/badge/OkHttp-4.12.0-2EA44F?style=flat-square)](https://square.github.io/okhttp/)
-  [![Target SDK](https://img.shields.io/badge/Target%20SDK-37-3DDC84?style=flat-square)](https://developer.android.com/)
-  [![Min SDK](https://img.shields.io/badge/Min%20SDK-24-lightgrey?style=flat-square)](https://developer.android.com/)
+  <p>
+    <a href="https://github.com/Brito21x"><img src="https://img.shields.io/static/v1?label=Author&message=Brito21x&color=181717&style=flat-square&logo=github&logoColor=white" alt="Author" /></a>
+    <a href="https://developer.android.com/"><img src="https://img.shields.io/static/v1?label=Platform&message=Android&color=3DDC84&style=flat-square&logo=android&logoColor=white" alt="Platform" /></a>
+    <a href="https://kotlinlang.org/"><img src="https://img.shields.io/static/v1?label=Kotlin&message=2.2.10&color=7F52FF&style=flat-square&logo=kotlin&logoColor=white" alt="Kotlin" /></a>
+    <a href="https://developer.android.com/jetpack/compose"><img src="https://img.shields.io/static/v1?label=Jetpack%20Compose&message=BOM%202026.02.01&color=4285F4&style=flat-square&logo=jetpackcompose&logoColor=white" alt="Jetpack Compose" /></a>
+    <a href="https://m3.material.io/"><img src="https://img.shields.io/static/v1?label=Material%203&message=Latest&color=006686&style=flat-square&logo=materialdesign&logoColor=white" alt="Material 3" /></a>
+    <a href="https://square.github.io/okhttp/"><img src="https://img.shields.io/static/v1?label=OkHttp&message=4.12.0&color=2EA44F&style=flat-square" alt="OkHttp" /></a>
+    <a href="https://developer.android.com/"><img src="https://img.shields.io/static/v1?label=Target%20SDK&message=37&color=3DDC84&style=flat-square&logo=android&logoColor=white" alt="Target SDK" /></a>
+    <a href="https://developer.android.com/"><img src="https://img.shields.io/static/v1?label=Min%20SDK&message=24&color=555555&style=flat-square&logo=android&logoColor=white" alt="Min SDK" /></a>
+  </p>
 </div>
 
 ---
