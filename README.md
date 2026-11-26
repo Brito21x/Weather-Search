@@ -1,12 +1,12 @@
-# Weather Search 🌤️
+# Weather Search
 
 <div align="center">
   <img src="screenshots/00_app_logo.png" alt="Weather Search Logo" width="160" />
-  
-  <h3>Aplicação Android de Consulta e Previsão Meteorológica</h3>
-  <p>Desenvolvida em <strong>Kotlin</strong> com <strong>Jetpack Compose</strong>, consumo REST assíncrono via <strong>OkHttp</strong> e navegação com <strong>Navigation Compose</strong>.</p>
 
-  [![Author](https://img.shields.io/badge/Author-Brito21x-blue?logo=github&style=flat-square)](https://github.com/Brito21x)
+  <h3>Native Android Weather Forecast Application</h3>
+  <p>Built in <strong>Kotlin</strong> with <strong>Jetpack Compose</strong>, asynchronous REST networking via <strong>OkHttp</strong>, and multi-screen navigation using <strong>Navigation Compose</strong>.</p>
+
+  [![Author](https://img.shields.io/badge/Author-Brito21x-blue?logo=github&logoColor=white&style=flat-square)](https://github.com/Brito21x)
   [![Platform](https://img.shields.io/badge/Platform-Android-3DDC84?logo=android&logoColor=white&style=flat-square)](https://developer.android.com/)
   [![Kotlin](https://img.shields.io/badge/Kotlin-2.2.10-7F52FF?logo=kotlin&logoColor=white&style=flat-square)](https://kotlinlang.org/)
   [![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-BOM%202026.02.01-4285F4?logo=android&logoColor=white&style=flat-square)](https://developer.android.com/jetpack/compose)
@@ -18,94 +18,98 @@
 
 ---
 
-## 📋 Índice
-- [Sobre o Projeto](#-sobre-o-projeto)
-- [Funcionalidades Principais](#-funcionalidades-principais)
-- [Demonstração Visual](#-demonstração-visual)
-- [API Utilizada (WeatherAPI)](#-api-utilizada-weatherapi)
-- [Especificações Técnicas](#-especificações-técnicas)
-- [Requisitos Cumpridos](#-requisitos-cumpridos)
-- [Boas Práticas de Engenharia](#-boas-práticas-de-engenharia)
-- [Estrutura do Projeto](#-estrutura-do-projeto)
-- [Instalação e Execução](#-instalação-e-execução)
-- [Tecnologias Utilizadas](#-tecnologias-utilizadas)
-- [Autor](#-autor)
+## Table of Contents
+
+- [Overview](#overview)
+- [Key Features](#key-features)
+- [Screenshots](#screenshots)
+- [System Architecture](#system-architecture)
+- [Weather API Integration](#weather-api-integration)
+- [Technical Specifications](#technical-specifications)
+- [Core Implementation Highlights](#core-implementation-highlights)
+- [Engineering Best Practices](#engineering-best-practices)
+- [Project Structure](#project-structure)
+- [Getting Started](#getting-started)
+- [Tech Stack](#tech-stack)
+- [Author](#author)
 
 ---
 
-## 📖 Sobre o Projeto
-O **Weather Search** é uma aplicação nativa para Android construída segundo as diretrizes modernas de desenvolvimento mobile da Google. Combina uma interface totalmente declarativa em **Jetpack Compose** com a robustez do cliente de rede **OkHttp**, proporcionando uma experiência de utilizador rápida, fluida e responsiva.
+## Overview
 
-A aplicação consome a API REST da **WeatherAPI**, processando os dados meteorológicos fora da *Main Thread* e estruturando a navegação através do padrão **Lista → Detalhe**, com suporte para pesquisa de cidades portuguesas e geolocalização automática via GPS.
+**Weather Search** is a native Android application built following Google's modern mobile architecture guidelines. It pairs a 100% declarative UI in **Jetpack Compose** with asynchronous REST networking via **OkHttp**, delivering a fast, responsive, and resilient user experience.
 
----
-
-## ✨ Funcionalidades Principais
-* **Tempo Atual em Destaque**:
-  * Apresentação da localidade e país (`location.name`, `location.country`).
-  * Temperatura atual em tempo real (`current.temp_c`).
-  * Condição meteorológica detalhada e ícone dinâmico (`current.condition.text`, `current.condition.icon`).
-* **Detalhes Rápidos**:
-  * Sensação térmica em °C (`current.feelslike_c`).
-  * Humidade relativa do ar em % (`current.humidity`).
-  * Velocidade do vento em km/h (`current.wind_kph`).
-* **Pesquisa de Cidades com Filtro Portugal**:
-  * Caixa de pesquisa com sugestões rápidas para cidades nacionais (*Barcelos*, *Braga*, *Porto*, *Lisboa*, *Coimbra*, *Faro*, *Funchal*).
-  * Normalização de pesquisa que prioriza localidades de Portugal e evita sobreposição com cidades homónimas internacionais.
-* **Geolocalização Automática via GPS**:
-  * Deteção das coordenadas do dispositivo com a biblioteca Google Play Services Location (`FusedLocationProviderClient`).
-* **Previsão Diária (Padrão Lista → Detalhe)**:
-  * Lista diária implementada com `LazyColumn` e itens reutilizáveis (`ForecastDayRow`).
-  * Navegação para ecrã de detalhe (`ForecastDetailScreen`), apresentando os dados consolidados do dia:
-    * Data e dia da semana.
-    * Temperaturas máxima, mínima e média (`maxtemp_c`, `mintemp_c`, `avgtemp_c`).
-    * Probabilidade de precipitação em % (`daily_chance_of_rain`).
-    * Humidade e vento.
-* **Cidades Guardadas (Favoritos)**:
-  * Sistema de marcação rápida de cidades na barra de topo com persistência local em `SharedPreferences`.
-  * Ecrã dedicado acessível através da barra de navegação inferior.
-* **Partilha Nativa de Boletim**:
-  * Ação integrada para envio do resumo meteorológico via Android Sharesheet (`Intent.ACTION_SEND`).
-* **Feedback de Interface (ViewState)**:
-  * Gestão de estado integrada e reativa através de `HomeViewState` (`searchQuery`, `weather`, `errorMessage`, `isLoading`), permitindo renderização determinística de carregamento (*Loading*), dados com sucesso (*Success*), ecrã inicial (*Empty*) e tratamento de falhas (*Error*) com botão de nova tentativa.
+The application consumes the **WeatherAPI** REST service off the Main Thread, isolates network DTOs from domain models, and structures user flows around a **List-Detail** navigation pattern—complete with Portugal-prioritized city search, automatic GPS geolocation, local favorites persistence, and native system sharing.
 
 ---
 
-## 📱 Demonstração Visual
+## Key Features
+
+- **Real-Time Current Weather**:
+  - Displays the resolved city and country (`location.name`, `location.country`).
+  - Live temperature readout in Celsius (`current.temp_c`).
+  - Detailed weather condition description and dynamic status icon (`current.condition.text`, `current.condition.icon`).
+- **Quick Weather Metrics**:
+  - "Feels like" temperature in °C (`current.feelslike_c`).
+  - Relative humidity in % (`current.humidity`).
+  - Wind speed in km/h (`current.wind_kph`).
+- **City Search with Portugal Prioritization**:
+  - Search bar featuring quick-select chips for major Portuguese cities (*Barcelos*, *Braga*, *Porto*, *Lisboa*, *Coimbra*, *Faro*, *Funchal*).
+  - Query normalization that prioritizes locations in Portugal and prevents collisions with identically named international cities.
+- **Automatic GPS Geolocation**:
+  - Detects device coordinates using Google Play Services Location (`FusedLocationProviderClient`).
+- **Multi-Day Forecast (List-Detail Pattern)**:
+  - Daily forecast list built with `LazyColumn` and reusable row components (`ForecastDayRow`).
+  - Navigates to a dedicated detail screen (`ForecastDetailScreen`) displaying consolidated daily metrics:
+    - Date and day of the week.
+    - Maximum, minimum, and average temperatures (`maxtemp_c`, `mintemp_c`, `avgtemp_c`).
+    - Daily chance of rain in % (`daily_chance_of_rain`).
+    - Humidity and wind speed.
+- **Saved Cities (Favorites)**:
+  - One-tap bookmarking in the top app bar backed by local persistence via `SharedPreferences`.
+  - Dedicated favorites screen accessible from the bottom navigation bar.
+- **Native Forecast Sharing**:
+  - Built-in sharing action that exports the weather summary through the Android Sharesheet (`Intent.ACTION_SEND`).
+- **Deterministic UI State Management (`ViewState`)**:
+  - Reactive state handling via `HomeViewState` (`searchQuery`, `weather`, `errorMessage`, `isLoading`), ensuring predictable rendering across *Loading*, *Success*, *Empty*, and *Error* (with retry action) states.
+
+---
+
+## Screenshots
 
 <div align="center">
   <table>
     <tr>
-      <td align="center" width="50%"><strong>Ecrã Principal (Weather Search)</strong></td>
-      <td align="center" width="50%"><strong>Cidades Guardadas (Favoritos)</strong></td>
+      <td align="center" width="50%"><strong>Home Screen (Weather Search)</strong></td>
+      <td align="center" width="50%"><strong>Saved Cities (Favorites)</strong></td>
     </tr>
     <tr>
       <td align="center">
-        <img src="screenshots/01_home_screen.png" width="280" alt="Ecrã Principal Weather Search" />
+        <img src="screenshots/01_home_screen.png" width="280" alt="Weather Search Home Screen" />
       </td>
       <td align="center">
-        <img src="screenshots/02_favorites_screen.png" width="280" alt="Ecrã Cidades Guardadas" />
+        <img src="screenshots/02_favorites_screen.png" width="280" alt="Saved Cities Favorites Screen" />
       </td>
     </tr>
     <tr>
       <td valign="top">
-        <strong>Funcionalidades Apresentadas:</strong>
+        <strong>Highlighted Capabilities:</strong>
         <ul>
-          <li><strong>Barra de Pesquisa</strong>: Caixa com suporte a limpeza rápida e botão para geolocalização GPS automática.</li>
-          <li><strong>Sugestões Rápidas</strong>: Chips horizontais para cidades portuguesas (<em>Barcelos, Braga, Porto, Lisboa</em>).</li>
-          <li><strong>Cartão Meteorológico</strong>: Gradiente azul com localidade (<em>Barcelos, Portugal</em>), temperatura atual (16°C), sensação térmica e ícone da condição.</li>
-          <li><strong>Detalhes Rápidos</strong>: Cartões de Sensação (13°C), Humidade (95%) e Vento (26 km/h).</li>
-          <li><strong>Lista de Previsão Diária</strong>: Coleção <code>LazyColumn</code> com previsões futuras e navegação para detalhe.</li>
-          <li><strong>TopBar Integrada</strong>: Botão de marcador para adicionar aos favoritos e botão de partilha do boletim.</li>
+          <li><strong>Search Bar</strong>: Text input with one-tap clear and automatic GPS geolocation trigger.</li>
+          <li><strong>Quick Suggestions</strong>: Horizontal filter chips for Portuguese cities (<em>Barcelos, Braga, Porto, Lisboa</em>).</li>
+          <li><strong>Current Weather Card</strong>: Blue gradient hero card showing location (<em>Barcelos, Portugal</em>), live temperature (16°C), feels-like temperature, and condition icon.</li>
+          <li><strong>Quick Metrics</strong>: Compact cards for Feels Like (13°C), Humidity (95%), and Wind (26 km/h).</li>
+          <li><strong>Daily Forecast List</strong>: <code>LazyColumn</code> displaying upcoming forecasts with click-through navigation to daily details.</li>
+          <li><strong>Integrated TopBar</strong>: Reactive bookmark action for favorites and native forecast sharing button.</li>
         </ul>
       </td>
       <td valign="top">
-        <strong>Funcionalidades Apresentadas:</strong>
+        <strong>Highlighted Capabilities:</strong>
         <ul>
-          <li><strong>Lista de Favoritos</strong>: Cidades guardadas localmente pelo utilizador (<em>Barcelos, Braga, Faro</em>).</li>
-          <li><strong>Consulta Imediata</strong>: Ao tocar em qualquer cartão, a aplicação carrega a previsão do tempo dessa cidade.</li>
-          <li><strong>Eliminação Rápida</strong>: Botão de eliminação direta para gerir a lista de localidades guardadas.</li>
-          <li><strong>Navegação Reativa</strong>: Barra inferior com <code>NavigationBar</code> e sincronização direta com a rota ativa do <code>NavController</code>.</li>
+          <li><strong>Favorites List</strong>: Cities persisted locally by the user (<em>Barcelos, Braga, Faro</em>).</li>
+          <li><strong>Instant Lookup</strong>: Tapping any saved city card immediately loads its live forecast.</li>
+          <li><strong>Quick Removal</strong>: Direct delete action on each card to manage saved locations effortlessly.</li>
+          <li><strong>Reactive Navigation</strong>: Bottom <code>NavigationBar</code> synchronized directly with the active <code>NavController</code> route.</li>
         </ul>
       </td>
     </tr>
@@ -114,190 +118,242 @@ A aplicação consome a API REST da **WeatherAPI**, processando os dados meteoro
 
 ---
 
-## 🌐 API Utilizada (WeatherAPI)
-A aplicação consome os serviços da [WeatherAPI](https://www.weatherapi.com/), um fornecedor global de dados meteorológicos em tempo real e de previsão.
+## System Architecture
 
-### Endpoint Consumido
-```http
-GET https://api.weatherapi.com/v1/forecast.json?key={API_KEY}&q={CIDADE}&days={DIAS}&aqi=no&alerts=no&lang=pt
+The application follows a modular **MVVM (Package-by-Feature)** architecture with **Unidirectional Data Flow (UDF)** and a **Single Source of Truth (SSOT)** repository layer:
+
+```text
+╔═══════════════════════════════════════════════════════════════════╗
+║                     UI LAYER — Jetpack Compose                    ║
+║        HomeScreen · FavoritesScreen · ForecastDetailScreen        ║
+║             WeatherTopBar · WeatherBottomBar · NavHost            ║
+╚═════════════════════════════════╤═════════════════════════════════╝
+                                  │  UI Events · StateFlow
+╔═════════════════════════════════▼═════════════════════════════════╗
+║                 PRESENTATION LAYER — MVVM & UDF                   ║
+║   HomeViewModel · FavoritesViewModel · ForecastDetailViewModel    ║
+║              Immutable ViewStates · Coroutines & Flow             ║
+╚═════════════════════════════════╤═════════════════════════════════╝
+                                  │  Domain Models (WeatherDomain)
+╔═════════════════════════════════▼═════════════════════════════════╗
+║                DATA LAYER — Single Source of Truth                ║
+║                         WeatherRepository                         ║
+║    In-Memory Forecast Cache   │   SharedPreferences (Favorites)   ║
+╚═════════════════════════════════╤═════════════════════════════════╝
+                                  │  Async HTTP · OkHttp enqueue()
+╔═════════════════════════════════▼═════════════════════════════════╗
+║                    NETWORK LAYER — REST Client                    ║
+║               WeatherApiClient (OkHttp 4.12 + Gson)               ║
+║                        HTTPS · WeatherAPI                         ║
+╚═══════════════════════════════════════════════════════════════════╝
 ```
 
-### Parâmetros da Requisição
-| Parâmetro | Tipo | Descrição |
+---
+
+## Weather API Integration
+
+The app integrates with [WeatherAPI](https://www.weatherapi.com/), a global real-time and multi-day weather data provider.
+
+### Endpoint
+
+```http
+GET [https://api.weatherapi.com/v1/forecast.json?key=](https://api.weatherapi.com/v1/forecast.json?key=){API_KEY}&q={CITY}&days={DAYS}&aqi=no&alerts=no&lang=pt
+```
+
+### Query Parameters
+
+| Parameter | Type | Description |
 | :--- | :--- | :--- |
-| `key` | `String` | Chave de autenticação única fornecida pelo portal WeatherAPI. |
-| `q` | `String` | Query de localização (nome da cidade formatado ou coordenadas `latitude,longitude`). |
-| `days` | `Int` | Quantidade de dias de previsão solicitados (configurado para 5 dias). |
-| `aqi` | `String` | Define se inclui dados de qualidade do ar (`no` para otimizar o payload JSON). |
-| `alerts` | `String` | Define se inclui alertas governamentais extensos (`no` para manter a resposta leve). |
-| `lang` | `String` | Código do idioma para as descrições meteorológicas (`pt` para português). |
+| `key` | `String` | Unique authentication key provided by the WeatherAPI portal. |
+| `q` | `String` | Location query (formatted city name or `latitude,longitude` coordinates). |
+| `days` | `Int` | Number of forecast days requested (configured to 5 days). |
+| `aqi` | `String` | Controls air quality data inclusion (`no` to minimize JSON payload size). |
+| `alerts` | `String` | Controls government weather alerts inclusion (`no` to keep responses lightweight). |
+| `lang` | `String` | Language code for localized weather descriptions (`pt` for Portuguese). |
 
-### Estrutura de Dados Mapeada
-* **Localização (`location`)**:
-  * `location.name`: Nome oficial da localidade (ex.: *"Barcelos"*).
-  * `location.country`: País correspondente (ex.: *"Portugal"*).
-* **Tempo Atual (`current`)**:
-  * `current.temp_c`: Temperatura atual em graus Celsius.
-  * `current.condition.text`: Descrição legível em português (ex.: *"Parcialmente nublado"*).
-  * `current.condition.icon`: URL do ícone meteorológico (prefixado com `https:`).
-  * `current.feelslike_c`: Sensação térmica atual em °C.
-  * `current.humidity`: Humidade relativa do ar em percentagem (%).
-  * `current.wind_kph`: Velocidade do vento em km/h.
-* **Previsão Diária (`forecast.forecastday`)**:
-  * `date`: Data no formato ISO (`YYYY-MM-DD`).
-  * `day.maxtemp_c` e `day.mintemp_c`: Temperaturas máxima e mínima previstas.
-  * `day.avgtemp_c`: Temperatura média estimada para o dia.
-  * `day.daily_chance_of_rain`: Probabilidade de ocorrência de chuva em percentagem (%).
-  * `day.condition.icon` e `day.condition.text`: Ícone e descrição do tempo previsto.
+### Mapped Data Structure
+
+- **Location (`location`)**:
+  - `location.name`: Official locality name (e.g., *"Barcelos"*).
+  - `location.country`: Corresponding country (e.g., *"Portugal"*).
+- **Current Conditions (`current`)**:
+  - `current.temp_c`: Current temperature in degrees Celsius.
+  - `current.condition.text`: Human-readable condition summary (e.g., *"Parcialmente nublado"*).
+  - `current.condition.icon`: Weather icon URL (prefixed with `https:`).
+  - `current.feelslike_c`: Feels-like temperature in °C.
+  - `current.humidity`: Relative humidity percentage (%).
+  - `current.wind_kph`: Wind speed in km/h.
+- **Daily Forecast (`forecast.forecastday`)**:
+  - `date`: ISO-formatted date (`YYYY-MM-DD`).
+  - `day.maxtemp_c` & `day.mintemp_c`: Forecasted high and low temperatures.
+  - `day.avgtemp_c`: Estimated daily average temperature.
+  - `day.daily_chance_of_rain`: Probability of precipitation (%).
+  - `day.condition.icon` & `day.condition.text`: Forecasted condition icon and description.
 
 ---
 
-## 📊 Especificações Técnicas
+## Technical Specifications
 
-| Parâmetro | Detalhe |
+| Specification | Detail |
 | :--- | :--- |
-| **Arquitetura** | MVVM modular (Package-by-Feature) + Repository Pattern + Unidirectional Data Flow (UDF) |
-| **Toolkit de UI** | 100% Jetpack Compose com Material Design 3 |
-| **Linguagem** | Kotlin 2.2.10 |
-| **Cliente de Rede** | OkHttp 4.12.0 (Chamadas assíncronas via `enqueue`) |
-| **Parser JSON** | Google Gson 2.11.0 |
-| **Carregador de Imagens** | Coil Compose 2.7.0 (com salvaguarda para Previews nativas) |
-| **Requisitos Mínimos** | Android 7.0 (API 24) |
+| **Architecture** | Modular MVVM (Package-by-Feature) + Repository Pattern + Unidirectional Data Flow (UDF) |
+| **UI Toolkit** | 100% Jetpack Compose with Material Design 3 |
+| **Language** | Kotlin 2.2.10 |
+| **Networking Client** | OkHttp 4.12.0 (Asynchronous calls via `enqueue`) |
+| **JSON Serialization** | Google Gson 2.11.0 |
+| **Image Loading** | Coil Compose 2.7.0 (with native `@Preview` inspection fallback) |
+| **Minimum SDK** | Android 7.0 (API 24) |
 | **Target SDK** | Android 15 / 16 Preview (API 37) |
-| **Gestão de Dependências** | Gradle Version Catalogs (`libs.versions.toml`) |
+| **Dependency Management** | Gradle Version Catalogs (`libs.versions.toml`) |
 
 ---
 
-## 🛠️ Requisitos Cumpridos
+## Core Implementation Highlights
 
-### 1. Consumo de APIs REST com OkHttp
-- [x] Configuração da dependência **OkHttp** e permissão `android.permission.INTERNET`.
-- [x] Execução de pedidos HTTP GET de forma assíncrona fora da Main Thread através de **`enqueue()`**.
-- [x] Processamento de respostas JSON e mapeamento para modelos Kotlin tipados com **Gson**.
-- [x] Exposição do resultado à Compose UI via ViewModels dedicados por ecrã (**`HomeViewModel`**, **`FavoritesViewModel`**, **`ForecastDetailViewModel`**) e **`StateFlow`** consumidos com **`collectAsState()`**.
-- [x] Tratamento robusto de falhas de rede (DNS, timeout, perda de ligação) e códigos HTTP inesperados.
+### 1. Asynchronous REST Networking with OkHttp
+- Configured **OkHttp** networking with the `android.permission.INTERNET` manifest permission.
+- Executes HTTP `GET` requests asynchronously off the Main Thread via **`enqueue()`**.
+- Deserializes JSON payloads into strongly typed Kotlin models using **Gson**.
+- Exposes reactive state to the Compose UI through dedicated per-screen ViewModels (**`HomeViewModel`**, **`FavoritesViewModel`**, **`ForecastDetailViewModel`**) and **`StateFlow`** collected via **`collectAsState()`**.
+- Handles network failures (DNS resolution, timeouts, connectivity loss) and unexpected HTTP status codes gracefully.
 
-### 2. Padrão Lista → Detalhe em Compose
-- [x] Exibição de coleções com **`LazyColumn`** e itens reutilizáveis (**`ForecastDayRow`**).
-- [x] Modelagem de dados de domínio desacoplados da camada de rede (**`WeatherDomain`**, **`ForecastDayDomain`**).
-- [x] Navegação de um item da lista para um ecrã de detalhe (**`ForecastDetailScreen`**) com dados do item selecionado.
-- [x] Tratamento determinístico de estados de interface via **`HomeViewState`** (*searchQuery*, *weather*, *errorMessage*, *isLoading*).
-- [x] Separação do Composable da linha da lista e do ecrã de detalhe em ficheiros e pacotes modulares distintos.
+### 2. List-Detail Pattern in Jetpack Compose
+- Renders forecast collections with **`LazyColumn`** and reusable item components (**`ForecastDayRow`**).
+- Decouples domain models (**`WeatherDomain`**, **`ForecastDayDomain`**) from raw network DTOs.
+- Navigates from any forecast row to a dedicated detail view (**`ForecastDetailScreen`**) displaying the selected day's data.
+- Enforces deterministic UI state rendering through **`HomeViewState`** (`searchQuery`, `weather`, `errorMessage`, `isLoading`).
+- Organizes list row composables and detail screens into separate, modular feature packages.
 
-### 3. Navegação Multi-Ecrã com Navigation Compose
-- [x] Definição de rotas tipadas através de **`sealed class Screen`** e grafo com **`NavHost`** / **`NavController`** integrado em **`MainActivity.kt`**.
-- [x] Organização estrutural com **`Scaffold`** (`topBar`, `bottomBar`, conteúdo).
-- [x] Barra de navegação inferior com **`NavigationBar`** e **`NavigationBarItem`** sincronizada com o estado da rota atual.
-- [x] Barra superior dinâmica (**`WeatherTopBar`**) com título adaptativo, botão voltar e ações reativas de partilha e favoritos.
-- [x] Distinção de ecrãs base e ecrãs de detalhe (`isBaseScreen`, `popBackStack()`).
-
----
-
-## 💡 Boas Práticas de Engenharia
-* **Zero Bloqueios na Main Thread**: Todo o processamento de rede e parsing de dados corre em threads secundárias do pool do OkHttp.
-* **Single Source of Truth (SSOT)**: O repositório central (`WeatherRepository`) é a única fonte de verdade para cache em memória e persistência local, evitando duplicação de dados.
-* **Arquitetura Modular por Funcionalidade (Package-by-Feature)**: Cada ecrã possui o seu próprio ViewModel e ViewState autocontido, eliminando o anti-padrão do "God ViewModel" e garantindo escalabilidade:
-  * `HomeViewModel` com `HomeViewState` (pesquisa e boletim principal);
-  * `FavoritesViewModel` com `FavoritesViewState` (gestão e persistência de cidades guardadas);
-  * `ForecastDetailViewModel` com `ForecastDetailViewState` (leitura dos dados detalhados do dia em memória).
-* **Desacoplamento Rigoroso da Camada de UI**: Os ViewModels são puros e não retêm referências a `Context` nem constroem `Intent`s; a abertura do sistema de partilha nativo é orquestrada na camada de UI.
-* **Reatividade com Kotlin Coroutines & Flow**: Uso de `StateFlow` e do operador `combine` para reatividade imediata no ícone de favoritos da barra superior.
-* **Navegação Integrada e Reativa**: A `MainActivity` alberga o `Scaffold`, o `NavHost` (`WeatherApp`) e as barras adaptativas, consumindo as rotas declaradas no `Screen.kt`.
-* **Suporte a Previews no Android Studio**: Todos os componentes visuais contêm funções `@Preview` operacionais (sem falhas de LayoutLib por recurso ao `LocalInspectionMode`).
-* **Design Edge-to-Edge**: Aplicação configurada com `enableEdgeToEdge()` para integração total com barras de estado e navegação do sistema.
-* **Ícones Adaptativos**: Ícone oficial com suporte a máscaras dinâmicas (círculo, quadrado e squircle) em Android 8.0+.
+### 3. Multi-Screen Navigation with Navigation Compose
+- Defines type-safe navigation routes via **`sealed class Screen`** and orchestrates the navigation graph using **`NavHost`** / **`NavController`** in **`MainActivity.kt`**.
+- Structures the app layout around **`Scaffold`** (`topBar`, `bottomBar`, screen content).
+- Synchronizes the bottom **`NavigationBar`** and **`NavigationBarItem`** selections directly with the active back-stack route.
+- Provides a dynamic **`WeatherTopBar`** with context-aware titles, back navigation, native sharing, and favorite toggling.
+- Distinguishes top-level destinations from detail screens (`isBaseScreen`, `popBackStack()`).
 
 ---
 
-## 📁 Estrutura do Projeto
+## Engineering Best Practices
+
+| Practice | Implementation |
+| :--- | :--- |
+| **Zero Main-Thread Blocking** | All network requests and JSON deserialization execute on OkHttp's background thread pool. |
+| **Single Source of Truth (SSOT)** | `WeatherRepository` centralizes in-memory forecast caching and `SharedPreferences` persistence, preventing state duplication. |
+| **Package-by-Feature Modularity** | Each screen owns an isolated ViewModel and immutable ViewState (`HomeViewModel`/`HomeViewState`, `FavoritesViewModel`/`FavoritesViewState`, `ForecastDetailViewModel`/`ForecastDetailViewState`), avoiding the "God ViewModel" anti-pattern. |
+| **Strict UI/Presentation Decoupling** | ViewModels remain framework-agnostic—holding no `Context` references and constructing no `Intent`s. Native share sheet invocation is handled exclusively in the UI layer. |
+| **Reactive Coroutines & Flow** | Leverages `StateFlow` and the `combine` operator to keep the top-bar favorite indicator synchronized in real time. |
+| **Compose Preview Readiness** | Every UI component ships with working `@Preview` functions protected against LayoutLib failures via `LocalInspectionMode`. |
+| **Edge-to-Edge Display** | Configured with `enableEdgeToEdge()` for seamless rendering behind system status and navigation bars. |
+| **Adaptive Launcher Icons** | Supports dynamic OEM icon masks (circle, square, squircle) on Android 8.0+. |
+
+---
+
+## Project Structure
 
 ```text
 app/src/main/java/upca/example/weathersearch/
 │
-├── MainActivity.kt                 # Ponto de entrada Android, Scaffold e Grafo de Navegação (WeatherApp)
+├── MainActivity.kt                    # Android entry point, Scaffold, and Navigation Graph (WeatherApp)
 │
 ├── data/
 │   ├── model/
-│   │   └── WeatherModels.kt        # DTOs da API e Modelos de Domínio
+│   │   └── WeatherModels.kt           # API DTOs and decoupled Domain Models
 │   ├── network/
-│   │   └── WeatherApiClient.kt     # Cliente OkHttp com enqueue assíncrono
+│   │   └── WeatherApiClient.kt        # OkHttp client with asynchronous enqueue() execution
 │   └── repository/
-│       └── WeatherRepository.kt    # Repositório de dados e preferências
+│       └── WeatherRepository.kt       # Data repository (in-memory cache & SharedPreferences)
 │
 ├── navigation/
-│   └── Screen.kt                   # Sealed class de rotas e destinos
+│   └── Screen.kt                      # Type-safe sealed class defining routes and destinations
 │
 ├── ui/
-│   ├── components/                 # Componentes de interface modulares e reutilizáveis
-│   │   ├── CurrentWeatherCard.kt   # Cartão de destaque do tempo atual
-│   │   ├── ForecastDayRow.kt       # Linha da lista de previsão diária
-│   │   ├── WeatherBottomBar.kt     # Barra de navegação inferior
-│   │   ├── WeatherIcon.kt          # Ícone com salvaguarda nativa para Previews
-│   │   ├── WeatherStateViews.kt    # Vistas de Loading, Error e Empty
-│   │   └── WeatherTopBar.kt        # Barra superior com ações de voltar, partilhar e favoritar
+│   ├── components/                    # Modular, reusable UI components
+│   │   ├── CurrentWeatherCard.kt      # Current weather hero card
+│   │   ├── ForecastDayRow.kt          # Reusable daily forecast list item
+│   │   ├── WeatherBottomBar.kt        # Bottom navigation bar
+│   │   ├── WeatherIcon.kt             # Remote icon loader with @Preview fallback
+│   │   ├── WeatherStateViews.kt       # Loading, Error, and Empty state views
+│   │   └── WeatherTopBar.kt           # Contextual top bar (back, share, favorite actions)
 │   │
-│   ├── detail/                     # Ecrã de detalhe
-│   │   ├── ForecastDetailScreen.kt # Ecrã com dados meteorológicos detalhados do dia
-│   │   └── ForecastDetailViewModel.kt # ViewModel e ForecastDetailViewState
+│   ├── detail/                        # Forecast detail feature
+│   │   ├── ForecastDetailScreen.kt    # Detailed daily weather metrics screen
+│   │   └── ForecastDetailViewModel.kt # ViewModel and ForecastDetailViewState
 │   │
-│   ├── favorites/                  # Ecrã de cidades guardadas
-│   │   ├── FavoritesScreen.kt      # Ecrã de listagem e remoção de favoritos
-│   │   └── FavoritesViewModel.kt   # ViewModel e FavoritesViewState
+│   ├── favorites/                     # Saved cities feature
+│   │   ├── FavoritesScreen.kt         # Saved locations list and management screen
+│   │   └── FavoritesViewModel.kt      # ViewModel and FavoritesViewState
 │   │
-│   ├── home/                       # Ecrã principal da aplicação
-│   │   ├── HomeScreen.kt           # Ecrã principal com pesquisa e LazyColumn
-│   │   └── HomeViewModel.kt        # ViewModel e HomeViewState
+│   ├── home/                          # Main weather search feature
+│   │   ├── HomeScreen.kt              # Search bar, quick chips, hero card, and LazyColumn
+│   │   └── HomeViewModel.kt           # ViewModel and HomeViewState
 │   │
-│   └── theme/                      # Tema visual e design system Material 3
-│       ├── Color.kt                # Paleta de cores do Weather Search
-│       ├── Theme.kt                # Configuração do tema claro e escuro
-│       └── Type.kt                 # Tipografia do Compose
+│   └── theme/                         # Material Design 3 visual system
+│       ├── Color.kt                   # Weather Search color palette
+│       ├── Theme.kt                   # Light and dark theme configuration
+│       └── Type.kt                    # Compose typography scale
 ```
 
 ---
 
-## 🚀 Instalação e Execução
+## Getting Started
 
-### 1. Clonar o Repositório
+### Prerequisites
+
+- Android Studio (latest stable release)
+- JDK 17 or higher
+- Android SDK (API 24–37)
+- A free API key from [WeatherAPI](https://www.weatherapi.com/)
+
+### 1. Clone the repository
+
 ```bash
-git clone https://github.com/Brito21x/WeatherSearch.git
+git clone [https://github.com/Brito21x/WeatherSearch.git](https://github.com/Brito21x/WeatherSearch.git)
 cd WeatherSearch
 ```
 
-### 2. Configurar a Chave da API
-Crie ou edite o ficheiro `local.properties` na raiz do projeto e configure a sua chave da WeatherAPI:
+### 2. Configure your API key
+
+Create or edit the `local.properties` file in the project root and add your WeatherAPI key. Storing secrets in `local.properties` keeps credentials out of version control:
+
 ```properties
-WEATHER_API_KEY=sua_api_key_aqui
+WEATHER_API_KEY=your_api_key_here
 ```
 
-### 3. Compilação
-Execute o build do projeto através do Gradle Wrapper:
+### 3. Build the APK
+
+Run the build using the Gradle Wrapper:
 
 ```powershell
-# No Windows:
+# Windows
 .\gradlew.bat assembleDebug
 
-# No macOS / Linux:
+# macOS / Linux
 ./gradlew assembleDebug
 ```
 
-O ficheiro APK compilado estará disponível em:
+Once the build succeeds, the compiled debug APK is generated at:
+
 ```text
 app/build/outputs/apk/debug/app-debug.apk
 ```
 
 ---
 
-## 🧰 Tecnologias Utilizadas
-* **Linguagem**: [Kotlin 2.2.10](https://kotlinlang.org/)
-* **Interface Gráfica**: [Jetpack Compose](https://developer.android.com/jetpack/compose) com [Material 3](https://m3.material.io/)
-* **Navegação**: [Navigation Compose 2.8.5](https://developer.android.com/jetpack/compose/navigation)
-* **Cliente HTTP**: [OkHttp 4.12.0](https://square.github.io/okhttp/) (Pedidos assíncronos com `enqueue`)
-* **Desserialização JSON**: [Gson 2.11.0](https://github.com/google/gson)
-* **Carregamento de Imagens**: [Coil Compose 2.7.0](https://coil-kt.github.io/coil/compose/)
-* **Localização**: [Google Play Services Location 21.3.0](https://developers.google.com/android/guides/setup)
+## Tech Stack
+
+- **Language**: [Kotlin 2.2.10](https://kotlinlang.org/)
+- **UI Framework**: [Jetpack Compose](https://developer.android.com/jetpack/compose) with [Material 3](https://m3.material.io/)
+- **Navigation**: [Navigation Compose 2.8.5](https://developer.android.com/jetpack/compose/navigation)
+- **HTTP Client**: [OkHttp 4.12.0](https://square.github.io/okhttp/) (Asynchronous requests via `enqueue`)
+- **JSON Parsing**: [Gson 2.11.0](https://github.com/google/gson)
+- **Image Loading**: [Coil Compose 2.7.0](https://coil-kt.github.io/coil/compose/)
+- **Location Services**: [Google Play Services Location 21.3.0](https://developers.google.com/android/guides/setup)
 
 ---
 
-## 👤 Autor
-Desenvolvido por **[@Brito21x](https://github.com/Brito21x)**.
+## Author
+
+**Edgar Brito** · Polytechnic University of Cávado and Ave (UPCA)  
+Computer Systems Engineering
+
+[![GitHub](https://img.shields.io/badge/GitHub-Brito21x-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/Brito21x)
